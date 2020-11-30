@@ -1,8 +1,7 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
   }  
-
-
+const jwt = require('jsonwebtoken')
 const express = require('express')
 const bcrypt = require("bcrypt")
 var fs = require('fs')
@@ -13,6 +12,7 @@ const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
 const initializePassport = require('./passport-config')
+const { authenticate } = require('passport')
 const PORT = 3000
 const router = express.Router();
 
@@ -41,6 +41,11 @@ router.get('/register', async (req,res)=>{
     res.send("hiiii")
 })
 
+router.get('/login', authenticateToken, (req, res)=>{
+    console.log(req.user)
+    res.send(req.headers['authorization'])
+})
+
 router.post('/register', async (req,res)=>{
     try{
         
@@ -66,6 +71,7 @@ router.post('/register', async (req,res)=>{
 
 router.post('/login', function (req, res, next) {
     // call passport authentication passing the "local" strategy name and a callback function
+    authenticatedUser = null
     passport.authenticate('local', function (error, user, info) {
       // this will execute in any case, even if a passport strategy will find an error
       // log everything to console
@@ -78,6 +84,7 @@ router.post('/login', function (req, res, next) {
       } else if (!user) {
         res.status(401).send(info);
       } else {
+        authenticatedUser = user
         next();
       }
 
@@ -87,12 +94,36 @@ router.post('/login', function (req, res, next) {
 
   // function to call once successfully authenticated
   function (req, res) {
-    res.status(200).send('logged in!');
+    const username = authenticatedUser.username;
+    const accessToken = jwt.sign(authenticatedUser, process.env.ACCESS_TOKEN_SECRET)
+    res.status(200).send(accessToken);
   });
 
-// function checkNotAuthenticated(req, res, next) {
+//   function checkAuthenticated(req, res, next) {
 //     if (req.isAuthenticated()) {
-//         return res.redirect('/')
-// }
+//       return next()
+//     }
+  
+//     res.redirect('/login')
+//   }
+  
+//   function checkNotAuthenticated(req, res, next) {
+//     if (req.isAuthenticated()) {
+//       return res.redirect('/')
+//     }
 //     next()
-// }
+//   }
+
+  function authenticateToken(req, res, next) {
+    
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401)
+  
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      console.log(err)
+      if (err) return res.sendStatus(403)
+      req.user = user
+      next()
+    })
+  }
