@@ -48,7 +48,12 @@ router.get('/login', authenticateToken, (req, res)=>{
 
 router.post('/register', async (req,res)=>{
     try{
-        
+        const foundUser = users.find(user => user.email.toUpperCase() === req.body.email.toUpperCase());
+        if(foundUser){
+          res.status(404).send("nope")
+          return
+        }
+        console.log("hi")
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         
         users.push({
@@ -69,7 +74,7 @@ router.post('/register', async (req,res)=>{
     }
 })
 
-router.post('/login', function (req, res, next) {
+router.post('/login', function (req, res, next){
     // call passport authentication passing the "local" strategy name and a callback function
     authenticatedUser = null
     passport.authenticate('local', function (error, user, info) {
@@ -78,10 +83,11 @@ router.post('/login', function (req, res, next) {
     //   console.log(error);
     //   console.log(user);
     //   console.log(info);
-
       if (error) {
         res.status(401).send(error);
       } else if (!user) {
+        res.status(401).send(info);
+      } else if(!user.isVerified){
         res.status(401).send(info);
       } else {
         authenticatedUser = user
