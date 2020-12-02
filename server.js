@@ -14,12 +14,15 @@ const session = require('express-session')
 const initializePassport = require('./passport-config')
 const authenticate = require('passport')
 const PORT = 3000
-const nodemailer = require('nodemailer')
+const cors = require('cors');
+
 const router = express.Router();
 
 app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
 });
+
+app.use(cors());
 
 initializePassport(
     passport,
@@ -48,7 +51,6 @@ router.get('/login', authenticateToken, (req, res)=>{
 })
 
 router.get("/confirmation/:token", (req,res)=>{
-  console.log("hello")
   jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     for (let i = 0; i < users.length; i++) {
         if(users[i].email === user.email){
@@ -66,6 +68,7 @@ router.get("/confirmation/:token", (req,res)=>{
 
 router.post('/register', async (req,res)=>{
     try{
+        console.log('hi')
         const foundUser = users.find(user => user.email.toUpperCase() === req.body.email.toUpperCase());
         if(foundUser){
           res.status(404).send("nope")
@@ -91,7 +94,7 @@ router.post('/register', async (req,res)=>{
         const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
         const url = `http://localhost:3000/UA/confirmation/${accessToken}`
         console.log(url)
-        res.send(users[users.length -1])
+        res.send(url)
     } catch {
       
     }
@@ -101,15 +104,15 @@ router.post('/register', async (req,res)=>{
 
 router.post('/login', function (req, res, next){
     // call passport authentication passing the "local" strategy name and a callback function
-    
+    console.log(req.body.password)
+    console.log(req.body.username)
     authenticatedUser = null
     passport.authenticate('local', function (error, user, info) {
-      console.log(user)
       
       // this will execute in any case, even if a passport strategy will find an error
       // log everything to console
       //   console.log(error);
-      //   console.log(user);
+        console.log(user);
       //   console.log(info);
       if (error) {
         
@@ -122,7 +125,7 @@ router.post('/login', function (req, res, next){
         return
       } 
       else if(!user.isVerified){
-
+        console.log("not verified");
         res.status(401).send("not verified");
         return
       } 
@@ -144,7 +147,10 @@ router.post('/login', function (req, res, next){
   function (req, res) {
     const username = authenticatedUser.username;
     const accessToken = jwt.sign(authenticatedUser, process.env.ACCESS_TOKEN_SECRET)
-    res.status(200).send(accessToken);
+    const access = {
+      accesstoken: accessToken
+    }
+    res.status(200).send(access);
   });
 
 //   function checkAuthenticated(req, res, next) {
@@ -162,6 +168,7 @@ router.post('/login', function (req, res, next){
 //     next()
 //   }
 
+
   function authenticateToken(req, res, next) {
     
     const authHeader = req.headers['authorization']
@@ -176,6 +183,4 @@ router.post('/login', function (req, res, next){
     })
   }
 
-  // step 1
-
-// async..await is not allowed in global scope, must use a wrapper
+  

@@ -1,11 +1,12 @@
 <body>
-<div class="container">
-    <label for="uname"><b>Username</b></label>
-    <input type="text" placeholder="Enter Username" name="uname" required>
+    <a routerLink="">Back home</a>
+    <p>Please register</p>
+    <span>
+        email: <input #email type="text">
+        username: <input #username type="text">
+        password: <input #password type="text">
+        <button (click)="register(email.value,username.value,password.value)">Login</button>
+    </span>
 
-    <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" required>
 
-    <button type="submit">Login</button>
-  </div>
 </body>

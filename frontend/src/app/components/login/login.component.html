@@ -1,0 +1,16 @@
+<body>
+    <a routerLink="register">register</a>
+    <router-outlet></router-outlet>
+    <h1>Draft My Schedule!!!!</h1>
+<h2>This site is a replica of draft my schedule. It will allow you to see publically accessible scheduales and login to make your own scheduales. Administrators can also log in and make various changes to user profiles</h2>
+<div>
+    <h2>Add course to a given schedule</h2>
+    <span>
+        email: <input #email type="text">
+        Password: <input #password type="text">
+        <button (click)="login(email.value,password.value)">Login</button>
+    </span>
+</div>
+
+
+</body>

@@ -8,20 +8,20 @@ const httpOptions = {
     'Content-Type': 'application/json'
   })
 }
-
 @Injectable({
   providedIn: 'root'
 })
-export class LoginService {
+export class RegisterService {
 
-  loginURL: string = 'http://localhost:3000/UA/login'
+  registerURL: string = 'http://localhost:3000/UA/register'
   constructor(private http:HttpClient) { }
-  login(email:string, password:string):Observable<any>{
+  register(email:string, username:string, password:string):Observable<any>{
     const body= {
       email: email,
+      username: username,
       password: password,
     };
-    return this.http.post(`${this.loginURL}`,body,httpOptions)
+    return this.http.post(`${this.registerURL}`,body,httpOptions)
     .pipe(
       catchError(this.handleError)
     );
