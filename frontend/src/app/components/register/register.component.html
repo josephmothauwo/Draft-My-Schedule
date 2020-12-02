@@ -3,10 +3,10 @@
     <a routerLink="">Back home</a>
     <p>Please register</p>
     <span>
-        email: <input #email type="text">
-        username: <input #username type="text">
+        email: <input #email type="email" id="email" name="email">
+        username: <input #username type="text" >
         password: <input #password type="text">
-        <button (click)="register(email.value,username.value,password.value)">Login</button>
+        <button (click)="register(email.value,username.value,password.value)">Register</button>
         <a routerLink="/validated" (click) = "validate(validateToken)">{{validateToken}}</a>
     </span>
 </body>

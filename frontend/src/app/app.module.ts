@@ -7,6 +7,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { LoginComponent } from './components/login/login.component';
 import { RouterModule } from '@angular/router';
 import { ValidatedComponent } from './components/validated/validated.component';
+import { ValidatedUserComponent } from './components/validated-user/validated-user.component';
 
 
 @NgModule({
@@ -14,7 +15,8 @@ import { ValidatedComponent } from './components/validated/validated.component';
     AppComponent,
     RegisterComponent,
     LoginComponent,
-    ValidatedComponent
+    ValidatedComponent,
+    ValidatedUserComponent
   ],
   imports: [
     BrowserModule,

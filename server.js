@@ -74,6 +74,18 @@ router.post('/register', async (req,res)=>{
           res.status(404).send("nope")
           return
         }
+        flag = true
+        for (var i = 0; i < req.body.email.length; i++) {
+          if(req.body.email[i]=="@"){
+            flag =false
+          }
+        }
+
+        if(flag){
+          res.status(404).send("nope")
+          return
+        }
+        
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
 
         let tempUser = {
@@ -83,16 +95,19 @@ router.post('/register', async (req,res)=>{
           password: hashedPassword,
           isVerified: false,
           isAdmin: false,
-          isDeactivated: false
+          isDeactivated: false,
+          accessToken: null
         }
         
+        const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
+        const url = `http://localhost:3000/UA/confirmation/${accessToken}`
+        tempUser.accessToken = url
         users.push(tempUser)
         var stringifiedUsers = JSON.stringify(users, null, 2)
         fs.writeFile('users.json', stringifiedUsers, (err) => {
             if (err) throw err;
         });
-        const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
-        const url = `http://localhost:3000/UA/confirmation/${accessToken}`
+        
         var sendBack = {
           url: url
         }
@@ -128,7 +143,12 @@ router.post('/login', function (req, res, next){
       } 
       else if(!user.isVerified){
         console.log("not verified");
-        res.status(401).send("not verified");
+        var sendback = {
+          message:"not verified",
+          user: user
+        }
+        res.send(sendback).status(401)
+
         return
       } 
       else if(user.isDeactivated){
@@ -150,6 +170,8 @@ router.post('/login', function (req, res, next){
     const username = authenticatedUser.username;
     const accessToken = jwt.sign(authenticatedUser, process.env.ACCESS_TOKEN_SECRET)
     const access = {
+      message:"logged in!",
+      user: authenticatedUser,
       accesstoken: accessToken
     }
     res.status(200).send(access);

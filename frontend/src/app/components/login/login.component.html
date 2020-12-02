@@ -6,9 +6,11 @@
 <div>
     <h2>Add course to a given schedule</h2>
     <span>
-        email: <input #email type="text">
+        email: <input #email type="email">
         Password: <input #password type="text">
-        <button (click)="login(email.value,password.value)">Login</button>
+        <button  (click)="login(email.value,password.value) ">Login</button>
+        <button  *ngIf="sentBack.user.isVerified && !sentBack.user.isDeactivated" routerLink="/validatedUser">You have been logged in! Click here to continue</button>
+        <a routerLink="/validated" *ngIf="sentBack != null && sentBack.user.isVerified==false" (click) = "validate(sentBack.user.accessToken)">{{sentBack.user.accessToken}}</a>
 
     </span>
 </div>
