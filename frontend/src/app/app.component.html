@@ -1,18 +1,14 @@
-<nav class="navbar navbar-expand navbar-dark bg-dark">
-  <div class="navbar-nav">
-      <a class="nav-item nav-link" routerLink="/">Home</a>
-      <a class="nav-item nav-link" routerLink="/register">Register</a>
-      <button routerLink = "/register">hello</button>
-  </div>
-</nav>
-
-<!-- main content container -->
-<div class="jumbotron">
-  <div class="container">
-      <div class="row">
-          <div class="col-sm-8 offset-sm-2">
-              <router-outlet></router-outlet>
-          </div>
-      </div>
-  </div>
+<body>
+    <h1>Draft My Schedule!!!!</h1>
+<h2>This site is a replica of draft my schedule. It will allow you to see publically accessible scheduales and login to make your own scheduales. Administrators can also log in and make various changes to user profiles</h2>
+<div>
+    <h2>Add course to a given schedule</h2>
+    <span>
+        Username: <input #username type="text">
+        Password: <input #password type="text">
+        <button (click)="login(username.value,password.value)">Login</button>
+    </span>
 </div>
+
+
+</body>
