@@ -12,8 +12,9 @@ const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
 const initializePassport = require('./passport-config')
-const { authenticate } = require('passport')
+const authenticate = require('passport')
 const PORT = 3000
+const nodemailer = require('nodemailer')
 const router = express.Router();
 
 app.listen(PORT, () => {
@@ -46,6 +47,23 @@ router.get('/login', authenticateToken, (req, res)=>{
     res.send(req.headers['authorization'])
 })
 
+router.get("/confirmation/:token", (req,res)=>{
+  console.log("hello")
+  jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    for (let i = 0; i < users.length; i++) {
+        if(users[i].email === user.email){
+          users[i].isVerified = true;
+        }
+    }
+    var data = JSON.stringify(users, null, 2)
+    fs.writeFile('users.json', data, (err) => {
+      if (err) throw err;
+    });
+    res.send("sucess!")
+  })
+
+})
+
 router.post('/register', async (req,res)=>{
     try{
         const foundUser = users.find(user => user.email.toUpperCase() === req.body.email.toUpperCase());
@@ -53,52 +71,70 @@ router.post('/register', async (req,res)=>{
           res.status(404).send("nope")
           return
         }
-        console.log("hi")
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
+
+        let tempUser = {
+          id: Date.now().toString(),
+          email: req.body.email, 
+          username: req.body.username,
+          password: hashedPassword,
+          isVerified: false,
+          isAdmin: false
+        }
         
-        users.push({
-            id: Date.now().toString(),
-            email: req.body.email, 
-            username: req.body.username,
-            password: hashedPassword,
-            isVerified: false,
-            isAdmin: false
-        })
+        users.push(tempUser)
         var stringifiedUsers = JSON.stringify(users, null, 2)
         fs.writeFile('users.json', stringifiedUsers, (err) => {
             if (err) throw err;
         });
+        const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
+        const url = `http://localhost:3000/UA/confirmation/${accessToken}`
+        console.log(url)
         res.send(users[users.length -1])
     } catch {
-
+      
     }
 })
 
+
+
 router.post('/login', function (req, res, next){
     // call passport authentication passing the "local" strategy name and a callback function
+    
     authenticatedUser = null
     passport.authenticate('local', function (error, user, info) {
+      console.log(user)
+      
       // this will execute in any case, even if a passport strategy will find an error
       // log everything to console
-    //   console.log(error);
-    //   console.log(user);
-    //   console.log(info);
+      //   console.log(error);
+      //   console.log(user);
+      //   console.log(info);
       if (error) {
+        
         res.status(401).send(error);
-      } else if (!user) {
+        return
+      } 
+      else if (!user) {
+        
         res.status(401).send(info);
-      } else if(!user.isVerified){
-        res.status(401).send(info);
-      } else {
+        return
+      } 
+      else if(!user.isVerified){
+
+        res.status(401).send("not verified");
+        return
+      } 
+      else {
+        
         authenticatedUser = user
         next();
       }
-
       res.status(401).send(info);
+      
     })(req, res);
   },
-
-  // function to call once successfully authenticated
+  // function to call once successfully authicated
   function (req, res) {
     const username = authenticatedUser.username;
     const accessToken = jwt.sign(authenticatedUser, process.env.ACCESS_TOKEN_SECRET)
@@ -133,3 +169,7 @@ router.post('/login', function (req, res, next){
       next()
     })
   }
+
+  // step 1
+
+// async..await is not allowed in global scope, must use a wrapper
