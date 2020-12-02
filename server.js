@@ -79,7 +79,8 @@ router.post('/register', async (req,res)=>{
           username: req.body.username,
           password: hashedPassword,
           isVerified: false,
-          isAdmin: false
+          isAdmin: false,
+          isDeactivated: false
         }
         
         users.push(tempUser)
@@ -123,6 +124,11 @@ router.post('/login', function (req, res, next){
       else if(!user.isVerified){
 
         res.status(401).send("not verified");
+        return
+      } 
+      else if(user.isDeactivated){
+
+        res.status(401).send("not active");
         return
       } 
       else {
