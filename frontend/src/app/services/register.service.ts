@@ -27,6 +27,13 @@ export class RegisterService {
     );
   }
 
+  validate(token: string){
+    return this.http.get(`${token}`)
+    .pipe(
+      catchError(this.handleError)
+    );
+  }
+
   handleError(error) {
     let errorMessage = '';
     window.alert(error);

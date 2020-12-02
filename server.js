@@ -51,6 +51,7 @@ router.get('/login', authenticateToken, (req, res)=>{
 })
 
 router.get("/confirmation/:token", (req,res)=>{
+  console.log("hi")
   jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     for (let i = 0; i < users.length; i++) {
         if(users[i].email === user.email){
@@ -61,14 +62,13 @@ router.get("/confirmation/:token", (req,res)=>{
     fs.writeFile('users.json', data, (err) => {
       if (err) throw err;
     });
-    res.send("sucess!")
+    res.send(users)
   })
 
 })
 
 router.post('/register', async (req,res)=>{
     try{
-        console.log('hi')
         const foundUser = users.find(user => user.email.toUpperCase() === req.body.email.toUpperCase());
         if(foundUser){
           res.status(404).send("nope")
@@ -93,8 +93,10 @@ router.post('/register', async (req,res)=>{
         });
         const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
         const url = `http://localhost:3000/UA/confirmation/${accessToken}`
-        console.log(url)
-        res.send(url)
+        var sendBack = {
+          url: url
+        }
+        res.send(sendBack)
     } catch {
       
     }
