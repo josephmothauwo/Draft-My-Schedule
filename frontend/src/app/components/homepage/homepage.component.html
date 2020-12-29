@@ -3,3 +3,70 @@
     <router-outlet></router-outlet>
     <h1>Draft My Schedule!!!!</h1>
 <h2>This site is a replica of draft my schedule. It will allow you to see publically accessible scheduales and login to make your own scheduales. Administrators can also log in and make various changes to user profiles</h2>
+<body>
+    <div class="allCoursesSearch">
+        <h2>See all courses a UWO</h2>
+        <button (click)="showCourses()">See all courses</button>
+        <ol>
+            <li *ngFor="let course of allCourses" [course]="course"> {{course.subject}} | {{course.className}}</li>
+        </ol>
+    </div>
+    
+    <div>
+        <h2>Find all course codes for a given subject</h2>
+        <input #box type="text">
+        <button (click)="getCourseCodes(box.value)">Find all course codes</button>
+        <ol>
+            <li *ngFor="let courseCode of courseCodes" [courseCode]="courseCode"> {{courseCode}}</li>
+        </ol>
+    </div>
+    
+    <div>
+        <h2>Find all components for a given course code</h2>
+        <span>
+            Subject: <input #subject type="text">
+            Course Code: <input #courseCode type="text">
+            Course Component: <input #component type="text">
+            <button (click)="getCourseComponents(subject.value,courseCode.value,component.value)">Find all course codes</button>
+        </span>
+       
+        <ol>
+            <li *ngFor="let courseComponent of allCourseComponents" [ngStyle] ="{'background-color':(courseComponent.ssr_component=='LEC'? '#30D5C8' : (courseComponent.ssr_component=='LAB'? '#FF7F50' : '#b19cd9'))}"[courseComponent]="courseComponent">{{courseComponent.class_nbr}} | Days: {{courseComponent.days}} | Start Time: {{courseComponent.start_time}} | Location: {{courseComponent.facility_ID}} | Type: {{courseComponent.ssr_component}}</li>
+        </ol>
+    </div>
+    
+    <div>
+        <h2>Make a Schedule</h2>
+        <input #scheduleName type="text">
+        <button (click) ="putScheduleName(scheduleName.value)" >Add Schedule</button>
+        <button (click) ="deleteSchedule(scheduleName.value)">Delete Schedule</button>
+    </div>
+    
+    <div>
+        <h2>Add course to a given schedule</h2>
+        <span>
+            Subject: <input #subject type="text">
+            Course Code: <input #courseCode type="text">
+            Schedule Name: <input #scheduleName type="text">
+            <button (click)="putCourse(subject.value,courseCode.value,scheduleName.value)">Add Course</button>
+        </span>
+    </div>
+    
+    <div>
+        <h2>See courses in one Schedule</h2>
+        <input #box type="text">
+        <button (click)="getOneSchedule(box.value)">See schedule</button>
+        <ol>
+            <li *ngFor="let schedule of recievedSchedule" [ngStyle] ="{'background-color':(schedule.ssr_component=='LEC'? '#30D5C8' : (schedule.ssr_component=='LAB'? '#FF7F50' : '#b19cd9'))}"[schedule]="schedule"> Subject: {{schedule.subject}} | Course Code: {{schedule.catalog_nbr}} | Time: {{schedule.start_time}}-{{schedule.end_time}} | Place: {{schedule.facility_ID}} | Days: {{schedule.days}} | Type: {{schedule.ssr_component}}</li>
+        </ol>
+    </div>
+    
+    <div>
+        <h2>See schedule summary</h2>
+        <button (click)="getAllSchedules()">See summary</button>
+        <button (click)="deleteAllSchedules()">Delete All Schedules</button>
+        <ol>
+            <li *ngFor="let schedule of scheduleSummary" [schedule]="schedule"> Schedule Name: {{schedule[0]}} | Amount of Courses: {{schedule[1]}}</li>
+        </ol>
+    </div>
+</body>
