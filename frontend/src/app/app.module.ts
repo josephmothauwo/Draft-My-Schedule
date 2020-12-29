@@ -8,6 +8,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RouterModule } from '@angular/router';
 import { ValidatedComponent } from './components/validated/validated.component';
 import { ValidatedUserComponent } from './components/validated-user/validated-user.component';
+import { HomepageComponent } from './components/homepage/homepage.component';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { ValidatedUserComponent } from './components/validated-user/validated-us
     RegisterComponent,
     LoginComponent,
     ValidatedComponent,
-    ValidatedUserComponent
+    ValidatedUserComponent,
+    HomepageComponent
   ],
   imports: [
     BrowserModule,
