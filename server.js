@@ -96,12 +96,14 @@ router.post('/register', async (req,res)=>{
           isVerified: false,
           isAdmin: false,
           isDeactivated: false,
-          accessToken: null
+          accessToken: null, 
+          loginToken: null
         }
         
         const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
         const url = `http://localhost:3000/UA/confirmation/${accessToken}`
         tempUser.accessToken = url
+        tempUser.loginToken = accessToken
         users.push(tempUser)
         var stringifiedUsers = JSON.stringify(users, null, 2)
         fs.writeFile('users.json', stringifiedUsers, (err) => {

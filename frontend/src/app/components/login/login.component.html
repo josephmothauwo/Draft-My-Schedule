@@ -10,8 +10,11 @@
         Password: <input #password type="text">
         <button  (click)="login(email.value,password.value) ">Login</button>
         <p  *ngIf="sentBack.user.isVerified && !sentBack.user.isDeactivated" >You have been logged in! Click here to continue</p>
-        <a routerLink="/validated" *ngIf="sentBack != null && sentBack.user.isVerified==false" (click) = "validate(sentBack.user.accessToken)">{{sentBack.user.accessToken}}</a>
-
+        <p  *ngIf="!sentBack.user.isVerified" >You are not Verified</p> 
+        <button *ngIf="!sentBack.user.isVerified" (click) = "validateAgain()"> show link again</button>
+        <p  *ngIf="sentBack.user.isDeactivated" >Your account has been deactivated please contact the site admin at : 123-456-7890</p>
+        <a routerLink="/validated" *ngIf="showMe == true && sentBack != null && sentBack.user.isVerified==false" (click) = "validate(sentBack.user.accessToken)">{{sentBack.user.accessToken}}</a>
+        
     </span>
 </div>
 
