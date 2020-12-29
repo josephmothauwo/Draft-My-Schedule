@@ -69,22 +69,39 @@ router.get("/confirmation/:token", (req,res)=>{
 
 router.post('/register', async (req,res)=>{
     try{
-        const foundUser = users.find(user => user.email.toUpperCase() === req.body.email.toUpperCase());
-        if(foundUser){
-          res.status(404).send("nope")
+      if (req.body.email.length == 0 && eq.body.password.length == 0){
+        res.status(404).send("no email and password given")
+        return
+      }
+      if (req.body.password.length == 0){
+        res.status(404).send("no password")
+        return
+      }
+        if (req.body.email.length == 0){
+          res.status(404).send("no email")
+          return
+        }
+        if (req.body.password.length == 0){
+          res.status(404).send("no password")
           return
         }
         flag = true
         for (var i = 0; i < req.body.email.length; i++) {
           if(req.body.email[i]=="@"){
-            flag =false
+            flag = i
           }
         }
 
-        if(flag){
-          res.status(404).send("nope")
+        if(req.body.email.length - 1 == flag || flag == 0){
+          res.status(404).send("not a valid email")
           return
         }
+        const foundUser = users.find(user => user.email.toUpperCase() === req.body.email.toUpperCase());
+        if(foundUser){
+          res.status(404).send("no user found")
+          return
+        }
+        
         
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
 
@@ -126,6 +143,7 @@ router.post('/login', function (req, res, next){
     console.log(req.body.password)
     console.log(req.body.username)
     authenticatedUser = null
+
     passport.authenticate('local', function (error, user, info) {
       
       // this will execute in any case, even if a passport strategy will find an error

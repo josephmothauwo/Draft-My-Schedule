@@ -36,7 +36,9 @@ export class RegisterService {
 
   handleError(error) {
     let errorMessage = '';
-    window.alert(error);
+    console.log(error.error)
+    window.alert(error.error);
+    console.log(error, "hellooo")
     return throwError(error);
   }
 }
