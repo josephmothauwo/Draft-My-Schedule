@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
 import { ValidatedComponent } from './components/validated/validated.component';
 import { ValidatedUserComponent } from './components/validated-user/validated-user.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { HomepageComponent } from './components/homepage/homepage.component';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    RouterModule
+    RouterModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
