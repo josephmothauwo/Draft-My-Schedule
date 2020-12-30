@@ -12,6 +12,7 @@
             Subject: <input #subject type="text">
             Course Code with or Without Suffix: <input #courseCode type="text">
             <button (click)="getCourseComponents(subject.value,courseCode.value)">Find all course codes</button>
+            <button (click)="resetCoursesSearch()">reset search</button>
         </span>
         <!-- <ol>
             <li *ngFor="let courseComponent of allCourseComponents" [ngStyle] ="{'background-color':(courseComponent.ssr_component=='LEC'? '#30D5C8' : (courseComponent.ssr_component=='LAB'? '#FF7F50' : '#b19cd9'))}"[courseComponent]="courseComponent">{{courseComponent.subject}} | {{courseComponent.catalog_nbr}} | {{courseComponent.className}} | Days: {{courseComponent.days}} | Start Time: {{courseComponent.start_time}} | Location: {{courseComponent.facility_ID}} | Type: {{courseComponent.ssr_component}}</li>
@@ -23,20 +24,23 @@
             </mat-expansion-panel-header>
             <p>review</p>
         </mat-expansion-panel>
+        <h2>Find courses by Keyword</h2>
+        <span>
+            keyword <input #keyword type="text">
+            <button (click)="keyWordSearch(keyword.value)">Find all course codes</button>
+            <button (click)="resetKeywordSearch()">reset search</button>
+        </span>
+
+        <mat-expansion-panel *ngFor="let searchItem of keyWordSearchItems">
+            <mat-expansion-panel-header>
+                <mat-panel-title>{{searchItem.subject}} | {{searchItem.catalog_nbr}} | {{searchItem.className}} | Days: {{searchItem.days}} | Start Time: {{searchItem.start_time}} | Location: {{searchItem.facility_ID}} | Type: {{searchItem.ssr_component}}</mat-panel-title>
+                <mat-panel-description></mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>review</p>
+        </mat-expansion-panel>
        
         
     </div>
 
-    <!-- <mat-expansion-panel hideToggle>
-  <mat-expansion-panel-header>
-    <mat-panel-title>
-      This is the expansion title
-    </mat-panel-title>
-    <mat-panel-description>
-      This is a summary of the content
-    </mat-panel-description>
-  </mat-expansion-panel-header>
-  
-</mat-expansion-panel> -->
    
 </body>

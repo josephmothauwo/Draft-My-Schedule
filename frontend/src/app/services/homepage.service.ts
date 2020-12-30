@@ -19,6 +19,7 @@ export class HomepageService {
   constructor(private http:HttpClient) { }
   
   courseComponentsURL: string = 'http://localhost:3000/UA/courses/';
+  keyWordURL: string = 'http://localhost:3000/UA/keyword/';
 
   getCourseComponents(component:string):Observable<any[]>{
     console.log("get request for courses components!")
@@ -28,6 +29,16 @@ export class HomepageService {
       catchError(this.handleError)
     );
   }
+
+  keyWordSearch(keyWord:string):Observable<any[]>{
+    console.log("get request for keywords!")
+
+    return this.http.get<string[]>(`${this.keyWordURL}${keyWord}`)
+    .pipe(
+      catchError(this.handleError)
+    );
+  }
+
   
   handleError(error) {
     let errorMessage = '';

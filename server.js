@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 const jwt = require('jsonwebtoken')
 const express = require('express')
 const bcrypt = require("bcrypt")
+const stringSimilarity = require('string-similarity');
 var fs = require('fs')
 var usersData = fs.readFileSync("users.json")
 var users = JSON.parse(usersData)
@@ -229,6 +230,33 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
       return res.status(404).send('the course code or subject does not exist')
   }
   res.send(tableEntry)
+});
+
+router.get('/keyword/:keyword', (req, res) => {
+  keyword = req.params.keyword
+  tableEntry = []
+  
+  if(keyword.length < 4){
+    console.log(keyword.length)
+    return res.status(404).send("word must be longer than 4 characters")
+  }
+  
+  for(course of courses){
+    if(stringSimilarity.compareTwoStrings(course['catalog_nbr'].toString(), keyword) > 0.6 || stringSimilarity.compareTwoStrings(course['className'], keyword) > 0.6){
+      tableEntry.push({
+        "catalog_nbr" : course["catalog_nbr"].toString(),
+        "subject" : course["subject"], 
+        "className" : course["className"], 
+        "class_section" : course["course_info"][0]["class_section"],  
+        "ssr_component" : course["course_info"][0]["ssr_component"],
+        "start_time" : course["course_info"][0]["start_time"],
+        "end_time" : course["course_info"][0]["end_time"],
+        "days" : course["course_info"][0]["days"],
+      })
+    }
+  }
+  console.log(tableEntry)
+  return res.send(tableEntry)
 });
 
 

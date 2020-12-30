@@ -11,6 +11,7 @@ export class HomepageComponent implements OnInit {
 
   constructor(private HomepageService: HomepageService) { }
   allCourseComponents: string[];
+  keyWordSearchItems: string[];
   ngOnInit(): void {
   }
 
@@ -23,6 +24,21 @@ export class HomepageComponent implements OnInit {
       console.log(allCourseComponents)
       this.allCourseComponents = allCourseComponents
     });
+  }
+
+  keyWordSearch(keyWord:string){
+    keyWord = keyWord.toLocaleUpperCase()
+    this.HomepageService.keyWordSearch(keyWord).subscribe(keyWordSearchItems=> {
+      console.log(keyWordSearchItems)
+      this.keyWordSearchItems = keyWordSearchItems
+    });
+  }
+
+  resetCoursesSearch(){
+    this.allCourseComponents = []
+  }
+  resetKeywordSearch(){
+    this.keyWordSearchItems = []
   }
 
 
