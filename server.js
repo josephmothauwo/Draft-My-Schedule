@@ -136,6 +136,46 @@ router.post('/register', async (req,res)=>{
     }
 })
 
+router.get('/courses/:subject?/:course_code?', (req, res) => {
+  console.log(req.params.subject, req.params.course_code)
+  if(validate(req.params.subject) ||validate(req.params.course_code) || sanitization(req.params.subject) || sanitization(req.params.course_code)){
+      res.status(404).send('invalid input')
+  }
+  // filter course codes
+  const subject = strip(req.params.subject)
+  const course_code = strip(req.params.course_code)
+  // 2 different cases if the coursecomponent is given 
+  tableEntry = []
+  if(!req.params.course_component){
+      for(course of courses){
+          if(subject === course["subject"] && course_code === course["catalog_nbr"].toString() ){
+              for(component of course["course_info"]){
+                  tableEntry.push(component)
+              }
+          }
+      }
+  }
+  
+  else{
+      if(validate(req.params.course_component) || sanitization(req.params.course_component)){
+          res.status(404).send('invalid input')
+      }
+      const course_component = strip(req.params.course_component)
+      for(course of courses){
+          if(subject === course["subject"] && course_code === course["catalog_nbr"].toString()){
+              for(component of course["course_info"]){
+                  if (course_component === component["ssr_component"])
+                      tableEntry.push(component)
+              }
+          }
+      }
+  }
+  if (tableEntry.length === 0 ){
+      return res.status(404).send('the course code or subject does not exist')
+  }
+  res.send(tableEntry)
+});
+
 
 
 router.post('/login', function (req, res, next){
@@ -227,4 +267,23 @@ router.post('/login', function (req, res, next){
     })
   }
 
-  
+  function validate(inputString){
+    return ((inputString.length<2) || (inputString.length>20))
+}
+
+function sanitization(inputString){
+  const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/g;
+  const output = inputString.replace(format, "");
+
+  if (inputString  === output){
+      return false
+  }
+  else{
+      return true;
+  }
+}
+
+function strip(inputString){
+  const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/g;
+  return inputString.replace(format, "")
+}

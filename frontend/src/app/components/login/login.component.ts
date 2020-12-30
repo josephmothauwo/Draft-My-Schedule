@@ -21,10 +21,10 @@ export class LoginComponent implements OnInit {
       this.sentBack = access
       // console.log(this.sentBack)
       if(this.sentBack.message == "not verified"){
-        window.alert(this.sentBack.message)
+        window.alert("you are not registered")
       }
       else{
-        console.log(this.sentBack.accessToken)
+        console.log(this.sentBack.accesstoken)
         localStorage.setItem('currentToken', this.sentBack.accesstoken)
         
       }
