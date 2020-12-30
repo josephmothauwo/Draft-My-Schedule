@@ -13,6 +13,8 @@ const flash = require('express-flash')
 const session = require('express-session')
 const initializePassport = require('./passport-config')
 const authenticate = require('passport')
+var data = fs.readFileSync("Lab3-timetable-data.json")
+var courses = JSON.parse(data)
 const PORT = 3000
 const cors = require('cors');
 
@@ -138,34 +140,87 @@ router.post('/register', async (req,res)=>{
 
 router.get('/courses/:subject?/:course_code?', (req, res) => {
   console.log(req.params.subject, req.params.course_code)
-  if(validate(req.params.subject) ||validate(req.params.course_code) || sanitization(req.params.subject) || sanitization(req.params.course_code)){
-      res.status(404).send('invalid input')
-  }
+  
   // filter course codes
-  const subject = strip(req.params.subject)
-  const course_code = strip(req.params.course_code)
+  
+ 
   // 2 different cases if the coursecomponent is given 
   tableEntry = []
-  if(!req.params.course_component){
+  if(!req.params.course_code){
+    // console.log("hello")
+    if(validate(req.params.subject) || sanitization(req.params.subject)){
+      res.status(404).send('invalid input')
+    }
+    const subject = strip(req.params.subject)
       for(course of courses){
-          if(subject === course["subject"] && course_code === course["catalog_nbr"].toString() ){
-              for(component of course["course_info"]){
-                  tableEntry.push(component)
-              }
+          if(subject === course["subject"]){
+              tableEntry.push({
+                "catalog_nbr" : course["catalog_nbr"].toString(),
+                "subject" : course["subject"], 
+                "className" : course["className"], 
+                "class_section" : course["course_info"][0]["class_section"],  
+                "ssr_component" : course["course_info"][0]["ssr_component"],
+                "start_time" : course["course_info"][0]["start_time"],
+                "end_time" : course["course_info"][0]["end_time"],
+                "days" : course["course_info"][0]["days"],
+              })
           }
       }
   }
+  else if(req.params.subject == "NONE"){
+    
+    if(validate(req.params.course_code) || sanitization(req.params.course_code)){
+      res.status(404).send('invalid input')
+    }
+    const course_code = strip(req.params.course_code)
+    for(course of courses){
+     
+      let flag = true
+      for(let i = 0; i < course_code.length; i++){
+        if (course_code[i] != course["catalog_nbr"].toString()[i]){
+          flag = false
+        }
+      }
+      if(flag){
+          tableEntry.push({
+            "catalog_nbr" : course["catalog_nbr"].toString(),
+            "subject" : course["subject"], 
+            "className" : course["className"], 
+            "class_section" : course["course_info"][0]["class_section"],  
+            "ssr_component" : course["course_info"][0]["ssr_component"],
+            "start_time" : course["course_info"][0]["start_time"],
+            "end_time" : course["course_info"][0]["end_time"],
+            "days" : course["course_info"][0]["days"],
+          })
+      }
+    }
+  }
   
   else{
-      if(validate(req.params.course_component) || sanitization(req.params.course_component)){
+      if(validate(req.params.course_code) || sanitization(req.params.course_code) || validate(req.params.subject) || sanitization(req.params.subject)){
           res.status(404).send('invalid input')
       }
-      const course_component = strip(req.params.course_component)
+      const course_code = strip(req.params.course_code)
+      const subject = strip(req.params.subject)
       for(course of courses){
-          if(subject === course["subject"] && course_code === course["catalog_nbr"].toString()){
-              for(component of course["course_info"]){
-                  if (course_component === component["ssr_component"])
-                      tableEntry.push(component)
+          if(subject === course["subject"]){
+              let flag = true
+              for(let i = 0; i < course_code.length; i++){
+                if (course_code[i] != course["catalog_nbr"].toString()[i]){
+                  flag = false
+                }
+              }
+              if (flag){
+                tableEntry.push({
+                  "catalog_nbr" : course["catalog_nbr"].toString(),
+                  "subject" : course["subject"], 
+                  "className" : course["className"], 
+                  "class_section" : course["course_info"][0]["class_section"],  
+                  "ssr_component" : course["course_info"][0]["ssr_component"],
+                  "start_time" : course["course_info"][0]["start_time"],
+                  "end_time" : course["course_info"][0]["end_time"],
+                  "days" : course["course_info"][0]["days"],
+                })
               }
           }
       }

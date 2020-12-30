@@ -18,8 +18,6 @@ export class HomepageService {
   constructor(private http:HttpClient) { }
   
   courseComponentsURL: string = 'http://localhost:3000/UA/courses/';
-  
-  
 
   getCourseComponents(component:string):Observable<any[]>{
     console.log("get request for courses components!")

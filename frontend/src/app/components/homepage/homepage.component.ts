@@ -15,9 +15,12 @@ export class HomepageComponent implements OnInit {
   }
 
   getCourseComponents(subject:string, courseCode:string){
+    if(!subject){
+      subject = "None"
+    }
     var concat = `${subject.toLocaleUpperCase()}/${courseCode.toLocaleUpperCase()}`
     this.HomepageService.getCourseComponents(concat).subscribe(allCourseComponents=> {
-      
+      console.log(allCourseComponents)
       this.allCourseComponents = allCourseComponents
     });
   }

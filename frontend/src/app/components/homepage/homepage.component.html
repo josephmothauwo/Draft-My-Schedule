@@ -15,7 +15,7 @@
         </span>
        
         <ol>
-            <li *ngFor="let courseComponent of allCourseComponents" [ngStyle] ="{'background-color':(courseComponent.ssr_component=='LEC'? '#30D5C8' : (courseComponent.ssr_component=='LAB'? '#FF7F50' : '#b19cd9'))}"[courseComponent]="courseComponent">{{courseComponent.class_nbr}} | Days: {{courseComponent.days}} | Start Time: {{courseComponent.start_time}} | Location: {{courseComponent.facility_ID}} | Type: {{courseComponent.ssr_component}}</li>
+            <li *ngFor="let courseComponent of allCourseComponents" [ngStyle] ="{'background-color':(courseComponent.ssr_component=='LEC'? '#30D5C8' : (courseComponent.ssr_component=='LAB'? '#FF7F50' : '#b19cd9'))}"[courseComponent]="courseComponent">{{courseComponent.subject}} | {{courseComponent.catalog_nbr}} | {{courseComponent.className}} | Days: {{courseComponent.days}} | Start Time: {{courseComponent.start_time}} | Location: {{courseComponent.facility_ID}} | Type: {{courseComponent.ssr_component}}</li>
         </ol>
     </div>
     
