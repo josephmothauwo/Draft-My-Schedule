@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http'
-import { Observable, of } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
+
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -22,19 +23,16 @@ export class HomepageService {
   getCourseComponents(component:string):Observable<any[]>{
     console.log("get request for courses components!")
     console.log(component)
-    return this.http.get<any[]>(`${this.courseComponentsURL}${component}`)
+    return this.http.get<string[]>(`${this.courseComponentsURL}${component}`)
     .pipe(
       catchError(this.handleError)
     );
   }
   
-  private handleError<T>(result?: T) {
-    return (error: any): Observable<T> => {
-      // Display error in alert
-      alert(error.error)
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
+  handleError(error) {
+    let errorMessage = '';
+    console.log(error)
+    window.alert(error.error);
+    return throwError(errorMessage);
   }
 }
