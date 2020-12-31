@@ -15,14 +15,18 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
   }
   register(email:string, username: string, password:string){
-    
-    this.RegisterService.register(email, username, password).subscribe(token=> {
-      console.log(token)
-      this.validateToken= token.url
-    });
+    console.log("hey")
+    window.alert("hey")
+    // this.RegisterService.register(email, username, password).subscribe(token=> {
+    //   window.alert("hey")
+    //   // console.log(token["url"])
+    //   // this.validateToken = token.url
+    //   // console.log("hey")
+    // });
   }
 
   validate(token:string){
+    // console.log("hey")
     this.RegisterService.validate(token).subscribe(user=>{
       console.log(user)
     })

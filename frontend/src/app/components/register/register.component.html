@@ -4,12 +4,12 @@
     <p>Please register</p>
     <span>
         <form name = "myForm">
-            email: <input #email type="email" id="email" name="email" required ng-model="email">
-            username: <input #username type="text" id="username" name="username" required ng-model="myInput">
-            password: <input #password type="text"  id="password" name="password" required ng-model="myInput">
+            email: <input #email type="email" id="email" name="email" >
+            username: <input #username type="text" id="username" name="username" >
+            password: <input #password type="text"  id="password" name="password">
             <button (click)="register(email.value,username.value,password.value)">Register</button>
         </form>
         
-        <a routerLink="/validated" (click) = "validate(validateToken)">{{validateToken}}</a>
+        <!-- <a routerLink="/validated" (click) = "validate(validateToken)">{{validateToken}}</a> -->
     </span>
 </body>

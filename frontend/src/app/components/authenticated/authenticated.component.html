@@ -1,0 +1,9 @@
+
+<div>
+    <h2>Make a Schedule</h2>
+    Schedule Name: <input #scheduleName type="text">
+    Description: <input #description type="text">
+    Do you want it to be public?<input #public type="text">
+    <button (click) ="putScheduleName(scheduleName.value, description.value, public.value)" >Add Schedule</button>
+    <button (click) ="deleteSchedule(scheduleName.value)">Delete Schedule</button>
+</div>

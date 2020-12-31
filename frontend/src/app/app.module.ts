@@ -38,6 +38,7 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatTableModule} from '@angular/material/table';
 import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
+import { AuthenticatedComponent } from './components/authenticated/authenticated.component';
 
 
 
@@ -48,7 +49,8 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     LoginComponent,
     ValidatedComponent,
     ValidatedUserComponent,
-    HomepageComponent
+    HomepageComponent,
+    AuthenticatedComponent
   ],
   imports: [
     BrowserModule,

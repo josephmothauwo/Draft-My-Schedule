@@ -32,7 +32,7 @@ export class HomepageService {
 
   keyWordSearch(keyWord:string):Observable<any[]>{
     console.log("get request for keywords!")
-
+    
     return this.http.get<string[]>(`${this.keyWordURL}${keyWord}`)
     .pipe(
       catchError(this.handleError)

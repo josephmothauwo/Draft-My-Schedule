@@ -5,6 +5,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { ValidatedUserComponent } from './components/validated-user/validated-user.component';
 import { ValidatedComponent } from './components/validated/validated.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
+import { AuthenticatedComponent } from './components/authenticated/authenticated.component';
 
 
 
@@ -14,6 +15,7 @@ const routes: Routes = [
   { path:  '', component:  HomepageComponent},
   { path:  'validated', component:  ValidatedComponent},
   { path:  'validatedUser', component:  ValidatedUserComponent},
+  { path:  'authenticated', component:  AuthenticatedComponent},
   {path: '**', redirectTo: ""}
 ];
 

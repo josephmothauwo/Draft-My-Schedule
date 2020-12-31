@@ -16,6 +16,8 @@ const initializePassport = require('./passport-config')
 const authenticate = require('passport')
 var data = fs.readFileSync("Lab3-timetable-data.json")
 var courses = JSON.parse(data)
+var schdeulesData = fs.readFileSync("schedules.json")
+var schedules = JSON.parse(schdeulesData)
 const PORT = 3000
 const cors = require('cors');
 
@@ -54,7 +56,7 @@ router.get('/login', authenticateToken, (req, res)=>{
 })
 
 router.get("/confirmation/:token", (req,res)=>{
-  console.log("hi")
+  console.log("yeoooo")
   jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     for (let i = 0; i < users.length; i++) {
         if(users[i].email === user.email){
@@ -71,6 +73,7 @@ router.get("/confirmation/:token", (req,res)=>{
 })
 
 router.post('/register', async (req,res)=>{
+  console.log("hey")
     try{
       if (req.body.email.length == 0 && eq.body.password.length == 0){
         res.status(404).send("no email and password given")
@@ -88,7 +91,7 @@ router.post('/register', async (req,res)=>{
           res.status(404).send("no password")
           return
         }
-        flag = true
+        flag = 0
         for (var i = 0; i < req.body.email.length; i++) {
           if(req.body.email[i]=="@"){
             flag = i
@@ -101,7 +104,7 @@ router.post('/register', async (req,res)=>{
         }
         const foundUser = users.find(user => user.email.toUpperCase() === req.body.email.toUpperCase());
         if(foundUser){
-          res.status(404).send("no user found")
+          res.status(404).send("this email already exisits")
           return
         }
         
@@ -119,7 +122,7 @@ router.post('/register', async (req,res)=>{
           accessToken: null, 
           loginToken: null
         }
-        
+        console.log(tempUser)
         const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
         const url = `http://localhost:3000/UA/confirmation/${accessToken}`
         tempUser.accessToken = url
@@ -131,8 +134,9 @@ router.post('/register', async (req,res)=>{
         });
         
         var sendBack = {
-          url: url
+          "url": url
         }
+        console.log(sendBack)
         res.send(sendBack)
     } catch {
       
@@ -320,20 +324,19 @@ router.post('/login', function (req, res, next){
     res.status(200).send(access);
   });
 
-//   function checkAuthenticated(req, res, next) {
-//     if (req.isAuthenticated()) {
-//       return next()
-//     }
+  function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+      return next()
+    }
+    res.redirect('/login')
+  }
   
-//     res.redirect('/login')
-//   }
-  
-//   function checkNotAuthenticated(req, res, next) {
-//     if (req.isAuthenticated()) {
-//       return res.redirect('/')
-//     }
-//     next()
-//   }
+  // function checkNotAuthenticated(req, res, next) {
+  //   if (req.isAuthenticated()) {
+  //     return res.redirect('/')
+  //   }
+  //   next()
+  // }
 
 
   function authenticateToken(req, res, next) {
@@ -349,6 +352,40 @@ router.post('/login', function (req, res, next){
       next()
     })
   }
+
+// add a new schdeule to the schdeules json file
+router.put('/schedules/:schedule_name/:isPublic/:description?', (req, res) => {
+  console.log(req.params.description, req.params.description, req.params.isPublic)
+  if(validate(req.params.schedule_name) || sanitization(req.params.schedule_name)){
+      res.status(404).send('Name is already present or invalid name')
+      return
+  }
+
+  if(req.params.description!=undefined){
+    console.log(req.params.description)
+    if((validate(req.params.description) || sanitization(req.params.description))){
+      console.log(req.params.description)
+      res.status(404).send('Name is already present or invalid name')
+      return
+  }
+}
+  const schedule_name = strip(req.params.schedule_name)
+
+  if(schedules.find(s => s.name.toUpperCase() === schedule_name.toUpperCase())){
+      res.status(404).send('Name is already present or invalid name')
+      return
+  }
+  const newSchedule = {
+      name: schedule_name,
+      courses: [] 
+  }
+  schedules.push(newSchedule)
+  var data = JSON.stringify(schedules, null, 2)
+  fs.writeFile('schedules.json', data, (err) => {
+      if (err) throw err;
+    });
+  res.send(newSchedule) 
+});
 
   function validate(inputString){
     return ((inputString.length<2) || (inputString.length>20))
