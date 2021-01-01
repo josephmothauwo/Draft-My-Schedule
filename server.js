@@ -355,7 +355,7 @@ router.post('/login', function (req, res, next){
 
 // add a new schdeule to the schdeules json file
 router.put('/schedules/:schedule_name/:isPublic/:description?', (req, res) => {
-  console.log(req.params.description, req.params.description, req.params.isPublic)
+  console.log(req.params.schedule_name, req.params.description, req.params.isPublic)
   if(validate(req.params.schedule_name) || sanitization(req.params.schedule_name)){
       res.status(404).send('Name is already present or invalid name')
       return
@@ -370,13 +370,21 @@ router.put('/schedules/:schedule_name/:isPublic/:description?', (req, res) => {
   }
 }
   const schedule_name = strip(req.params.schedule_name)
-
+  const description = strip(req.params.description)
   if(schedules.find(s => s.name.toUpperCase() === schedule_name.toUpperCase())){
       res.status(404).send('Name is already present or invalid name')
       return
   }
+  const publicSched = false
+  const user = true
+  if(req.params.isPublic == "YES"){
+    publicSched = true
+  }
   const newSchedule = {
       name: schedule_name,
+      description: description,
+      isPublic: publicSched,
+      user: user, 
       courses: [] 
   }
   schedules.push(newSchedule)

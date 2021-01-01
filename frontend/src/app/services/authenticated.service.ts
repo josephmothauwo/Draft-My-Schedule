@@ -18,7 +18,7 @@ export class AuthenticatedService {
   constructor(private http:HttpClient) { }
 
   putScheduleName(name:string, description:string, isPublic: string):Observable<any>{
-    console.log("put request for schedule",name);
+    console.log("helooo")
     return this.http.put(`${this.scheduleNameURL}${name}/${isPublic}/${description}`,null, httpOptions)
     .pipe(
       catchError(this.handleError)
