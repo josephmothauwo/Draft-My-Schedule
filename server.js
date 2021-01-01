@@ -46,17 +46,24 @@ app.use(passport.session())
 
 router.use(express.json());
 app.use('/UA', router);
-router.get('/register', async (req,res)=>{
-    res.send("hiiii")
-})
 
-router.get('/login', authenticateToken, (req, res)=>{
-    console.log(req.user)
-    res.send(req.headers['authorization'])
-})
+// router.post('/login', (req, res)=>{
+//     // console.log(req.user)
+//     // res.send(req.headers['authorization'])
+//     const user = {
+//       id: 1,
+//       username: "joey",
+//       email: "hello@gmail.com"
+//     }
+//     jwt.sign({user: user}, "secretkey", (err, token) => {
+//       res.json({
+//         tokem: token
+//       })
+//     })
+
+// })
 
 router.get("/confirmation/:token", (req,res)=>{
-  console.log("yeoooo")
   jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     for (let i = 0; i < users.length; i++) {
         if(users[i].email === user.email){
@@ -73,9 +80,8 @@ router.get("/confirmation/:token", (req,res)=>{
 })
 
 router.post('/register', async (req,res)=>{
-  console.log("hey")
     try{
-      if (req.body.email.length == 0 && eq.body.password.length == 0){
+      if (req.body.email.length == 0 && req.body.password.length == 0){
         res.status(404).send("no email and password given")
         return
       }

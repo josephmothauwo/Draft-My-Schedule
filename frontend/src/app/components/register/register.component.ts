@@ -1,3 +1,4 @@
+import { ConstantPool } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { RegisterService } from 'src/app/services/register.service';
 
@@ -15,14 +16,12 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
   }
   register(email:string, username: string, password:string){
-    console.log("hey")
-    window.alert("hey")
-    // this.RegisterService.register(email, username, password).subscribe(token=> {
-    //   window.alert("hey")
-    //   // console.log(token["url"])
-    //   // this.validateToken = token.url
-    //   // console.log("hey")
-    // });
+    //
+    this.RegisterService.register(email, username, password).subscribe(token=> {
+      console.log(token)
+      window.alert("hello")
+      this.validateToken = token["url"]
+    });
   }
 
   validate(token:string){
