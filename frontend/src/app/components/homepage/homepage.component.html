@@ -41,6 +41,19 @@
             <p *ngFor = "let review of searchItem.reviews">Review: {{review.review}} || Username: {{review.userName}} || Date: {{review.creationDate}}</p>
         </mat-expansion-panel>
     </div>
-
+    <div>
+        <h2>See Public Course Lists</h2>
+        <button (click)="getPublicCourseLists()">See up to 10 public course Lists</button>
+        <button (click)="resetPublicCourseLists()">reset search</button>
+        <mat-expansion-panel *ngFor="let schedule of courseLists">
+            <mat-expansion-panel-header>
+                <mat-panel-title>Name: {{schedule.name}} || Creater Username: {{schedule.username}} || Number of Courses: {{schedule.courses.length}}</mat-panel-title>
+                <mat-panel-description>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <p>Description: {{schedule.description}}</p>
+            <p *ngFor = "let course of schedule.courses">{{course.subject}} | {{course.catalog_nbr}} | {{course.className}} | Days: {{course.days}} | Start Time: {{course.start_time}} | Location: {{course.facility_ID}} | Type: {{course.ssr_component}}</p>
+        </mat-expansion-panel>
+    </div>
    
 </body>

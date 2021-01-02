@@ -247,8 +247,22 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
   res.send(tableEntry)
 });
 
+router.get('/publicCourseLists', (req, res) => {
+  console.log("get request for 10 public course lists" )
+  let publicCourseLists = []
+  for(let i = 0; i < schedules.length && i < 10; i ++){
+    console.log(schedules)
+    if (schedules[i]["isPublic"]){
+      publicCourseLists.push(schedules[i])
+    }
+  }
+  publicCourseLists.sort(compareScheduleTime)
+  return res.send(publicCourseLists)
+});
 
 
+
+// key word search with soft matching
 router.get('/keyword/:keyword', (req, res) => {
   keyword = req.params.keyword
   tableEntry = []
@@ -668,4 +682,8 @@ function sanitization(inputString){
 function strip(inputString){
   const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/g;
   return inputString.replace(format, "")
+}
+function compareScheduleTime(a, b){
+  if (a["lastUpdated"] > b["lastUpdated"]) return -1;
+  if (a["lastUpdated"] < b["lastUpdated"]) return 1;
 }

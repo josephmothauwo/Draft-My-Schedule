@@ -40,7 +40,6 @@ export class HomepageService {
   }
   getPublicCoursesLists():Observable<any[]>{
     console.log("get request for public course lists!")
-    
     return this.http.get<string[]>(`${this.publicCourseListsURL}`)
     .pipe(
       catchError(this.handleError)

@@ -12,6 +12,7 @@ export class HomepageComponent implements OnInit {
   constructor(private HomepageService: HomepageService) { }
   allCourseComponents: string[];
   keyWordSearchItems: string[];
+  courseLists : string[];
   token = null
   ngOnInit(): void {
     console.log("hello")
@@ -49,5 +50,13 @@ export class HomepageComponent implements OnInit {
     this.keyWordSearchItems = []
   }
 
-
+  getPublicCourseLists(){
+    this.HomepageService.getPublicCoursesLists().subscribe(courseLists=> {
+      console.log(courseLists)
+      this.courseLists = courseLists
+    });
+  }
+  resetPublicCourseLists(){
+    this.courseLists = []
+  }
 }
