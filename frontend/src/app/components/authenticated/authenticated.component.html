@@ -7,3 +7,12 @@
     <button (click) ="putScheduleName(scheduleName.value, description.value, public.value)" >Add Schedule</button>
     <button (click) ="deleteSchedule(scheduleName.value)">Delete Schedule</button>
 </div>
+
+<div>
+    <h2>See schedule summary</h2>
+    <button (click)="getAllSchedules()">See summary</button>
+    <!-- <button (click)="deleteAllSchedules()">Delete All Schedules</button> -->
+    <ol>
+        <li *ngFor="let schedule of scheduleSummary" [schedule]="schedule"> Schedule Name: {{schedule[0]}} | Description: {{schedule[1]}} |Amount of Courses: {{schedule[2]}}</li>
+    </ol>
+</div>

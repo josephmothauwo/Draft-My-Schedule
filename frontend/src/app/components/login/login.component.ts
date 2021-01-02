@@ -12,6 +12,7 @@ export class LoginComponent implements OnInit {
   constructor(private LoginService:LoginService, private RegisterService:RegisterService) { }
   sentBack  = null
   showMe = false
+  token = null
   ngOnInit(): void {
   }
   login(email:string, password:string){
@@ -21,12 +22,11 @@ export class LoginComponent implements OnInit {
       this.sentBack = access
       // console.log(this.sentBack)
       if(this.sentBack.message == "not verified"){
-        window.alert("you are not registered")
+        window.alert("you are not verified")
       }
       else{
         console.log(this.sentBack.accesstoken)
         localStorage.setItem('currentToken', this.sentBack.accesstoken)
-        
       }
     });
   }

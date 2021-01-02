@@ -20,6 +20,7 @@ var schdeulesData = fs.readFileSync("schedules.json")
 var schedules = JSON.parse(schdeulesData)
 const PORT = 3000
 const cors = require('cors');
+const { verify } = require('crypto');
 
 const router = express.Router();
 
@@ -270,7 +271,6 @@ router.get('/keyword/:keyword', (req, res) => {
 });
 
 
-
 router.post('/login', function (req, res, next){
     // call passport authentication passing the "local" strategy name and a callback function
     console.log(req.body.password)
@@ -344,56 +344,57 @@ router.post('/login', function (req, res, next){
   //   next()
   // }
 
-
-  function authenticateToken(req, res, next) {
-    
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401)
-  
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      console.log(err)
-      if (err) return res.sendStatus(403)
-      req.user = user
-      next()
-    })
-  }
-
 // add a new schdeule to the schdeules json file
-router.put('/schedules/:schedule_name/:isPublic/:description?', (req, res) => {
+router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (req, res) => {
+  console.log(req.description, "hello")
   console.log(req.params.schedule_name, req.params.description, req.params.isPublic)
   if(validate(req.params.schedule_name) || sanitization(req.params.schedule_name)){
-      res.status(404).send('Name is already present or invalid name')
+      res.status(404).send('invalid Input')
       return
   }
-
-  if(req.params.description!=undefined){
-    console.log(req.params.description)
+  let description = null
+  let isPublic = null
+  if(req.params.description!=null){
     if((validate(req.params.description) || sanitization(req.params.description))){
       console.log(req.params.description)
-      res.status(404).send('Name is already present or invalid name')
+      res.status(404).send('invalid Input')
       return
-  }
+    }
+    else{
+      description = strip(req.params.description)
+    }
 }
+
+  if(req.params.isPublic!="False"){
+    console.log(req.params.isPublic)
+    if((validate(req.params.isPublic) || sanitization(req.params.isPublic))){
+      console.log(req.params.isPublic)
+      res.status(404).send('invalid Input')
+      return
+    }
+    else{
+      isPublic = strip(req.params.isPublic)
+    }
+  }
   const schedule_name = strip(req.params.schedule_name)
-  const description = strip(req.params.description)
+  console.log("hello")
   if(schedules.find(s => s.name.toUpperCase() === schedule_name.toUpperCase())){
       res.status(404).send('Name is already present or invalid name')
       return
   }
   const publicSched = false
-  const user = true
-  if(req.params.isPublic == "YES"){
+  if(isPublic == "YES"){
     publicSched = true
   }
   const newSchedule = {
       name: schedule_name,
       description: description,
       isPublic: publicSched,
-      user: user, 
+      email: req.user["email"], 
       courses: [] 
   }
   schedules.push(newSchedule)
+  console.log(schedules)
   var data = JSON.stringify(schedules, null, 2)
   fs.writeFile('schedules.json', data, (err) => {
       if (err) throw err;
@@ -401,9 +402,37 @@ router.put('/schedules/:schedule_name/:isPublic/:description?', (req, res) => {
   res.send(newSchedule) 
 });
 
+function verifyToken(req, res, next) {
+  const authHeader = req.headers['authorization']
+  const tokenHeader = authHeader.split(' ')
+  const token = tokenHeader[1]
+  if (token == null) return res.sendStatus(401)
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403)
+    req.user = user
+    next()
+  })
+}
+
+// get all the schedules
+router.get('/all_schedules',verifyToken, (req, res) => {
+  console.log(`GET request from ${req.url}`);
+  userEmail = req.user["email"]
+  let scheduleSummary = []
+  for(schedule of schedules){
+      if (userEmail.toUpperCase() == schedule["email"].toUpperCase()){
+        scheduleSummary.push([schedule["name"],schedule["description"],schedule["courses"].length])
+      }
+    }
+  res.send(scheduleSummary)
+});
+
+
   function validate(inputString){
     return ((inputString.length<2) || (inputString.length>20))
 }
+
 
 function sanitization(inputString){
   const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/g;

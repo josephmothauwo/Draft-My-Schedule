@@ -7,7 +7,7 @@ import { AuthenticatedService } from 'src/app/services/authenticated.service';
   styleUrls: ['./authenticated.component.css']
 })
 export class AuthenticatedComponent implements OnInit {
-
+  scheduleSummary : string[]
   constructor(private AuthenticatedService:AuthenticatedService) { }
 
   ngOnInit(): void {
@@ -16,7 +16,7 @@ export class AuthenticatedComponent implements OnInit {
     if(isPublic.toLocaleLowerCase() != "YES"){
       isPublic = "False"
     }
-    this.AuthenticatedService.putScheduleName(name, description, isPublic).subscribe(schedule => {
+    this.AuthenticatedService.putScheduleName(name, description, isPublic,localStorage.getItem('currentToken')).subscribe(schedule => {
       console.log(schedule);
     });
   }
@@ -24,6 +24,12 @@ export class AuthenticatedComponent implements OnInit {
   deleteSchedule(deleteName:string){
     this.AuthenticatedService.deleteSchedule(deleteName).subscribe(schedule => {
       console.log(schedule);
+    });
+  }
+
+  getAllSchedules(){
+    this.AuthenticatedService.getallSchedules(localStorage.getItem('currentToken')).subscribe(schedule => {
+      this.scheduleSummary = schedule
     });
   }
 

@@ -19,7 +19,6 @@ export class RegisterComponent implements OnInit {
     //
     this.RegisterService.register(email, username, password).subscribe(token=> {
       console.log(token)
-      window.alert("hello")
       this.validateToken = token["url"]
     });
   }

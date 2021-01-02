@@ -12,7 +12,15 @@ export class HomepageComponent implements OnInit {
   constructor(private HomepageService: HomepageService) { }
   allCourseComponents: string[];
   keyWordSearchItems: string[];
+  token = null
   ngOnInit(): void {
+    console.log("hello")
+    this.token = localStorage.getItem('currentToken');
+  }
+
+  isAuthenticated(){
+    console.log("hello")
+    return localStorage.getItem("currenToken") != null
   }
 
   getCourseComponents(subject:string, courseCode:string){
