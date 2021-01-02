@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
       else{
         console.log(this.sentBack.accesstoken)
         localStorage.setItem('currentToken', this.sentBack.accesstoken)
+        console.log(localStorage.getItem('currentToken'))
       }
     });
   }

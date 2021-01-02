@@ -4,12 +4,6 @@ import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 
 
-let headers: HttpHeaders = new HttpHeaders();
-    headers = headers.append('Accept', 'application/json');
-    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
-    const httpOptions = {
-      headers: headers
-    };
 @Injectable({
   providedIn: 'root'
 })
@@ -19,16 +13,30 @@ export class AuthenticatedService {
   addCourseURL: string = 'http://localhost:3000/UA/schedule/courses';
   editScheduleURL: string = 'http://localhost:3000/UA/editSchedule';
   addReviewURL: string = 'http://localhost:3000/UA/addReview';
+  newPasswordURL: string = 'http://localhost:3000/UA/newPassword';
   // scheduleNameURL: string = '/api/schedules/';
   constructor(private http:HttpClient) { }
 
   putScheduleName(name:string, description:string, isPublic: string, token: string):Observable<any>{
+    console.log(localStorage.getItem('currentToken'))
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
     return this.http.put(`${this.scheduleNameURL}${name}/${isPublic}/${description}`,null, httpOptions)
     .pipe(
       catchError(this.handleError)
     );
   }
   deleteSchedule(deleteName:string):Observable<any>{
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
     console.log("put delete request to delete a schedule");
     return this.http.delete(`${this.scheduleNameURL}${deleteName}`, httpOptions)
     .pipe(
@@ -37,8 +45,13 @@ export class AuthenticatedService {
   }
 
   getallSchedules(token: string):Observable<string[]>{
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
     console.log("get request for all schedules!")
-    
     return this.http.get<string[]>(`${this.allSchedulesURL}`, httpOptions)
     .pipe(
       catchError(this.handleError)
@@ -65,6 +78,12 @@ export class AuthenticatedService {
   }
 
   editSchedule(name, newName, description, isPublic, addCourse, deleteCourse):Observable<any>{
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
     console.log("put request for edit a schedule!")
     const body= {
       scheduleName: name.toLocaleUpperCase(),
@@ -83,11 +102,36 @@ export class AuthenticatedService {
   }
 
   addReview(courseName, review):Observable<any>{
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
     const body= {
       courseName: courseName,
       review: review
     };
     return this.http.put(`${this.addReviewURL}`,body,httpOptions)
+    .pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  updatePassword(newPassword, confirmedPassword):Observable<any>{
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
+    const body= {
+      newPassword: newPassword,
+      confirmedPassword: confirmedPassword
+    };
+    console.log(httpOptions)
+    console.log(body)
+    return this.http.put(`${this.newPasswordURL}`,body,httpOptions)
     .pipe(
       catchError(this.handleError)
     );

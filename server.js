@@ -52,6 +52,7 @@ app.use('/UA', router);
 
 
 router.get("/confirmation/:token", (req,res)=>{
+  console.log(req.params.token)
   jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     for (let i = 0; i < users.length; i++) {
         if(users[i].email === user.email){
@@ -64,7 +65,6 @@ router.get("/confirmation/:token", (req,res)=>{
     });
     res.send(users)
   })
-
 })
 
 router.post('/register', async (req,res)=>{
@@ -263,7 +263,29 @@ router.get('/publicCourseLists', (req, res) => {
   return res.send(publicCourseLists)
 });
 
-
+router.put('/newPassword', verifyToken, (req, res) => {
+  let newToken = null
+  console.log(req.body.newPassword, req.body.confirmedPassword)
+  if(validate(req.body.newPassword) || sanitization(req.body.confirmedPassword)){
+    res.status(404).send('invalid input')
+  }
+  if(req.body.newPassword != req.body.confirmedPassword){
+    res.status(404).send('passwords must match!')
+  }
+  for(user of users){
+    if (req.user["email"].toUpperCase() == user["email"].toUpperCase()){
+      user["password"] = bcrypt.hash(req.body.newPassword, 10)
+      newToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
+      user["loginToken"] = newToken
+      console.log(user)
+    }
+  }
+  var data = JSON.stringify(users, null, 2)
+  fs.writeFile('users.json', data, (err) => {
+      if (err) throw err;
+    });
+  res.send([newToken]) 
+});
 
 // key word search with soft matching
 router.get('/keyword/:keyword', (req, res) => {
@@ -301,82 +323,56 @@ router.get('/keyword/:keyword', (req, res) => {
 });
 
 
-router.post('/login', function (req, res, next){
-    // call passport authentication passing the "local" strategy name and a callback function
-    console.log(req.body.password)
-    console.log(req.body.username)
-    authenticatedUser = null
+router.post('/login', (req, res) => {
+  // call passport authentication passing the "local" strategy name and a callback function
+  console.log(req.body.password)
+  console.log(req.body.email)
+  authenticatedUser = null
+  for(user of users){
+    if(user.email.toUpperCase() == req.body.email.toUpperCase() && bcrypt.compare(user.email, req.body.password)){
+      authenticatedUser = user
+    }
+  }
+  if (!authenticatedUser) res.status(401).send("username or password is wrong")
+  // this will execute in any case, even if a passport strategy will find an error
+  // log everything to console
+  //   console.log(error);
+  console.log(authenticatedUser);
+  //   console.log(info);
+  if(!user.isVerified){
+    console.log("not verified");
+    var sendback = {
+      message:"not verified",
+      user: user
+    }
+    res.send(sendback).status(401)
+    return
+  } 
+  else if(user.isDeactivated){
 
-    passport.authenticate('local', function (error, user, info) {
-      
-      // this will execute in any case, even if a passport strategy will find an error
-      // log everything to console
-      //   console.log(error);
-        console.log(user);
-      //   console.log(info);
-      if (error) {
-        
-        res.status(401).send(error);
-        return
-      } 
-      else if (!user) {
-        
-        res.status(401).send(info);
-        return
-      } 
-      else if(!user.isVerified){
-        console.log("not verified");
-        var sendback = {
-          message:"not verified",
-          user: user
-        }
-        res.send(sendback).status(401)
-
-        return
-      } 
-      else if(user.isDeactivated){
-
-        res.status(401).send("not active");
-        return
-      } 
-      else {
-        
-        authenticatedUser = user
-        next();
-      }
-      res.status(401).send(info);
-      
-    })(req, res);
-  },
-  // function to call once successfully authicated
-  function (req, res) {
+    res.status(401).send("not active");
+    return
+  } 
+  else {
     const username = authenticatedUser.username;
     const accessToken = jwt.sign(authenticatedUser, process.env.ACCESS_TOKEN_SECRET)
+    authenticatedUser.loginToken = accessToken
     const access = {
       message:"logged in!",
       user: authenticatedUser,
       accesstoken: accessToken
     }
+    var data = JSON.stringify(users, null, 2)
+    fs.writeFile('users.json', data, (err) => {
+      if (err) throw err;
+    });
     res.status(200).send(access);
-  });
-
-  function checkAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-      return next()
-    }
-    res.redirect('/login')
-  }
-  
-  // function checkNotAuthenticated(req, res, next) {
-  //   if (req.isAuthenticated()) {
-  //     return res.redirect('/')
-  //   }
-  //   next()
-  // }
+  } 
+});
 
 // add a new schdeule to the schdeules json file
 router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (req, res) => {
-  
+  console.log("hello")
   console.log(req.params.schedule_name, req.params.description, req.params.isPublic)
   if(validate(req.params.schedule_name) || sanitization(req.params.schedule_name)){
       res.status(404).send('invalid Input')
@@ -438,8 +434,9 @@ function verifyToken(req, res, next) {
   const authHeader = req.headers['authorization']
   const tokenHeader = authHeader.split(' ')
   const token = tokenHeader[1]
+  console.log(token, "hellooo")
   if (token == null) return res.sendStatus(401)
-
+  
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403)
     req.user = user

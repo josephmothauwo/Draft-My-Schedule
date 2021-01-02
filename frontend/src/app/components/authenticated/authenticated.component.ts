@@ -60,5 +60,11 @@ export class AuthenticatedComponent implements OnInit {
   declineReview(){
     this.confirmReviewTrigger = false
   }
+  updatePassword(newPassword:string, confirmedPassword:string){
+    this.AuthenticatedService.updatePassword(newPassword, confirmedPassword).subscribe(newToken => {
+      localStorage.setItem('currentToken', newToken[0])
+      console.log(newToken);
+    });
+  }
 
 }
