@@ -18,6 +18,8 @@ var data = fs.readFileSync("Lab3-timetable-data.json")
 var courses = JSON.parse(data)
 var schdeulesData = fs.readFileSync("schedules.json")
 var schedules = JSON.parse(schdeulesData)
+var reviewsData = fs.readFileSync("reviews.json")
+var reviews = JSON.parse(reviewsData)
 const PORT = 3000
 const cors = require('cors');
 const { verify } = require('crypto');
@@ -404,6 +406,29 @@ function verifyToken(req, res, next) {
   })
 }
 
+// delete a schdeule from the schdeule JSON file
+router.delete('/schedules/:schedule_name', verifyToken, (req, res) => {
+  console.log(`DELETE request from ${req.url}`, req.user);
+  if(validate(req.params.schedule_name) || sanitization(req.params.schedule_name)){
+      res.status(404).send('invalid input')
+      return
+  }
+  const schedule_name =req.params.schedule_name
+  const schedule = schedules.find(s => s.name.toUpperCase() === schedule_name.toUpperCase() && s.email.toUpperCase() == req.user["email"].toUpperCase())
+  if(!schedule){
+      res.status(404).send('No schedules by this name')
+      return
+  }
+  const index = schedules.indexOf(schedule)
+  schedules.splice(index,1)
+  var data = JSON.stringify(schedules, null, 2)
+  fs.writeFile('schedules.json', data, (err) => {
+      if (err) throw err;
+    });
+
+  res.send(schedule)
+});
+
 // get all the schedules
 router.get('/all_schedules',verifyToken, (req, res) => {
   console.log(`GET request from ${req.url}`);
@@ -429,103 +454,170 @@ router.get('/publicSchedules', (req, res) => {
   res.send(scheduleSummary)
 });
 
-// add courses to a specific schedule
+// edit a schedule
 router.put('/editSchedule', verifyToken, (req, res) => {
-  // console.log(req.body.scheduleName,req.body.subjectNames, req.body.courseNumbers)
-  if(validate(req.body.scheduleName) || validate(req.body.scheduleName)){
+  let scheduleName = null
+  let newName = null
+  let description = null
+  let isPublic = null
+  let addCourse = null
+  let deleteCourse = null
+  let currSchedule = null
+
+  if (!req.body.scheduleName){
+    res.status(400).send('we need a schedule name')
+      return 
+  }
+  
+  if(validate(req.body.scheduleName) || sanitization(req.body.scheduleName)){
       res.status(400).send('invalid input')
       return 
   }
-  if(req.body.newName.deleteCourse > 0){
-    if(validate(req.body.newName) || validate(req.body.newName) ){
+  else{
+    scheduleName = req.body.scheduleName
+    for(schedule of schedules){
+      if((scheduleName == schedule["name"].toUpperCase()) && (schedule["email"].toUpperCase() == req.user["email"].toUpperCase())){
+        currSchedule = schedule
+      }
+    }
+    if (currSchedule == null){
+      return res.status(404).send("no schedule with that name")
+    }
+  } 
+  
+  if(req.body.newName.length > 0){
+    if(validate(req.body.newName) || sanitization(req.body.newName) ){
     res.status(400).send('invalid input')
     return 
-    } 
+    }
+    else{
+      newName = req.body.newName
+      currSchedule["name"] = newName
+    }
   }
+
   if(req.body.description.length > 0){
-    if(validate(req.body.description) || validate(req.body.description) ){
+    if(validate(req.body.description) || sanitization(req.body.description) ){
     res.status(400).send('invalid input')
     return 
+    }else{
+      description = req.body.description
+      currSchedule["description"] = description
     } 
   }
   if(req.body.isPublic.length > 0){
-    if(validate(req.body.isPublic) || validate(req.body.isPublic) ){
+    if(validate(req.body.isPublic) || sanitization(req.body.isPublic) ){
     res.status(400).send('invalid input')
     return 
     } 
+    else{
+      isPublic = req.body.isPublic
+      if(isPublic == "YES"){
+        currSchedule["isPublic"] = true
+      }
+      if(isPublic == "NO"){
+        currSchedule["isPublic"] = false
+      }
+    }
   }
   if(req.body.addCourse.length > 0){
-    if(validate(req.body.addCourse) || validate(req.body.addCourse) ){
+    if(validate(req.body.addCourse) || sanitization(req.body.addCourse) || req.body.addCourse.split(" ").length != 2){
     res.status(400).send('invalid input')
     return 
+    }
+    else{
+      addCourse = req.body.addCourse.length
+      addCourseSubject = req.body.addCourse.split(" ")[0]
+      addCourseNumber = req.body.addCourse.split(" ")[1]
+      isCourse = false
+      for (course of courses){
+        // console.log(course)
+        // console.log(addCourseSubject , course["subject"].toUpperCase() , addCourseNumber , course["catalog_nbr"].toString().toUpperCase())
+        if (addCourseSubject == course["subject"].toUpperCase() && addCourseNumber == course["catalog_nbr"].toString().toUpperCase()){
+          currSchedule["courses"].push({
+            "catalog_nbr" : course["catalog_nbr"].toString(),
+            "subject" : course["subject"], 
+            "className" : course["className"], 
+            "class_section" : course["course_info"][0]["class_section"],  
+            "ssr_component" : course["course_info"][0]["ssr_component"],
+            "start_time" : course["course_info"][0]["start_time"],
+            "end_time" : course["course_info"][0]["end_time"],
+            "days" : course["course_info"][0]["days"],
+          })
+          isCourse = true
+        }
+      }
+      if (!isCourse) res.status(400).send("no course with that name to add")
     } 
   }
 
   if(req.body.deleteCourse.length > 0){
-    if(validate(req.body.deleteCourse) || validate(req.body.deleteCourse) ){
+    if(validate(req.body.deleteCourse) || sanitization(req.body.deleteCourse) || req.body.deleteCourse.split(" ").length != 2){
     res.status(400).send('invalid input')
     return 
-    } 
-  }
-
-  const scheduleName = req.body.scheduleName
-  const newName = req.body.newName
-  const description = req.body.description
-  const isPublic = req.body.newName
-  const addCourse = req.body.addCourse
-  const deleteCourse = req.body.newName
-  let currSchedule = null
-  for(schedule of schedules){
-    if(scheduleName == schedule.["name"]){
-      currSchedule = schedule
+    }
+    else{
+      deleteCourse = req.body.deleteCourse
+      deleteCourseSubject = req.body.deleteCourse.split(" ")[0]
+      deleteCourseNumber = req.body.deleteCourse.split(" ")[1]
+      isCourse = false
+      for(let i = 0; i < currSchedule["courses"].length; i++){
+        course = currSchedule["courses"][i]
+        if(deleteCourseSubject == course["subject"].toUpperCase() && deleteCourseNumber == course["catalog_nbr"].toString().toUpperCase()){
+          currSchedule["courses"].splice(i, 1)
+          isCourse = true
+        }
+      }
+      if (!isCourse) res.status(400).send(" no course with that name to delete")
     }
   }
-  if (currSchedule == null){
-    return res.status(404).send("no schedule with that name")
-  }
-  const subjectsArray = subjectNames.split(" ")
-  const courseNumberArray = courseNumbers.split(" ")
 
-  
-  for(let i = 0; i<subjectsArray.length;i++){
-      var flag2 = true
-      for(let j = 0;j<courses.length;j++){
-          if(subjectsArray[i]===courses[j].subject && courseNumberArray[i]===courses[j].catalog_nbr.toString()){
-              flag2 = false
-          }
-      }
-      if(flag2){
-          res.status(404).send('invalid input')
-      return 
-      }
-
-  }
-  
-  if(scheduleNum < 0 || subjectsArray.length!=courseNumberArray.length){
-      console.log(scheduleNum)
-      res.status(400).send('schedule is not present')
-      return
-  }
-  // check if items are in the schdeule already or not
-  else{
-      for(let i=0;i<subjectsArray.length;i++){
-          var flag = true;
-          for(let j=0;j<schedules[scheduleNum].courses.length;j++){
-              if(subjectsArray[i] === schedules[scheduleNum].courses[j][0] && courseNumberArray[i] === schedules[scheduleNum].courses[j][1]){
-                  schedules[scheduleNum].courses[j]=([subjectsArray[i],courseNumberArray[i]])
-                  flag = false
-              }
-          }
-          if(flag){
-              schedules[scheduleNum].courses.push([subjectsArray[i],courseNumberArray[i]])
-          }
-      }
-  }
+  currSchedule["lastUpdated"] = new Date()
+  console.log(new Date())
   var data = JSON.stringify(schedules, null, 2)
   fs.writeFile('schedules.json', data, (err) => {
       if (err) throw err;
     });
-  res.send(schedules[scheduleNum]) 
+  res.send(currSchedule) 
+});
+
+router.put('/addReview', verifyToken, (req, res) => {
+  console.log("get put request to get add review!")
+  if(validate(req.body.courseName) || sanitization(req.body.courseName) || validate(req.body.review) || sanitization(req.body.review) || req.body.courseName.split(" ").length != 2){
+    res.status(400).send('invalid input')
+    return 
+    } 
+  else{
+    let courseID = req.body.courseName.split(" ")
+    courseNumber = courseID[1]
+    subject = courseID[0]
+    isCourse = false
+    for(course of courses){
+      if(subject.toUpperCase() == course["subject"].toUpperCase() && courseNumber.toUpperCase() == course["catalog_nbr"].toString().toUpperCase()){
+        var today = new Date();
+        var day = String(today.getDate()).padStart(2, '0');
+        var month = String(today.getMonth() + 1).padStart(2, '0');
+        var year = today.getFullYear();
+        today = month + '/' + day + '/' + year;
+        reviews.push({
+          subject: course["subject"],
+          catalog_nbr: course["catalog_nbr"].toString(),
+          isHidden: false, 
+          reviewID : reviews.length + 1,
+          userName: req.user["username"],
+          creationDate: today
+        })
+        isCourse = true
+      } 
+    }
+    if(!isCourse) res.status(400).send("this is not a valid course")
+  }
+  var data = JSON.stringify(reviews, null, 2)
+  fs.writeFile('reviews.json', data, (err) => {
+      if (err) throw err;
+    });
+  res.send(reviews) 
+
 });
 
 

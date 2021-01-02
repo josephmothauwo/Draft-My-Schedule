@@ -5,33 +5,32 @@ import { retry, catchError } from 'rxjs/operators';
 
 
 let headers: HttpHeaders = new HttpHeaders();
-headers = headers.append('Accept', 'application/json');
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticatedService {
   scheduleNameURL: string = 'http://localhost:3000/UA/schedules/';
   allSchedulesURL: string = 'http://localhost:3000/UA/all_schedules';
-  addCourseURL: string = '/http://localhost:3000/UA/schedule/courses';
-  editscheduleURL: string = '/http://localhost:3000/UA/editSchedule';
+  addCourseURL: string = 'http://localhost:3000/UA/schedule/courses';
+  editScheduleURL: string = 'http://localhost:3000/UA/editSchedule';
+  addReviewURL: string = 'http://localhost:3000/UA/addReview';
   // scheduleNameURL: string = '/api/schedules/';
   constructor(private http:HttpClient) { }
 
   putScheduleName(name:string, description:string, isPublic: string, token: string):Observable<any>{
-    let headers: HttpHeaders = new HttpHeaders();
-    headers = headers.append('Accept', 'application/json'); 
-    headers = headers.append("Authorization", "Bearer " + token);
-    const httpOptions = {
-      headers: headers
-    };
     return this.http.put(`${this.scheduleNameURL}${name}/${isPublic}/${description}`,null, httpOptions)
     .pipe(
       catchError(this.handleError)
     );
   }
   deleteSchedule(deleteName:string):Observable<any>{
-    console.log("put request for schedule");
-    return this.http.delete(`${this.scheduleNameURL}${deleteName}`)
+    console.log("put delete request to delete a schedule");
+    return this.http.delete(`${this.scheduleNameURL}${deleteName}`, httpOptions)
     .pipe(
       catchError(this.handleError)
     );
@@ -39,12 +38,7 @@ export class AuthenticatedService {
 
   getallSchedules(token: string):Observable<string[]>{
     console.log("get request for all schedules!")
-    let headers: HttpHeaders = new HttpHeaders();
-    headers = headers.append('Accept', 'application/json');
-    headers = headers.append("Authorization", "Bearer " + token);
-    const httpOptions = {
-      headers: headers
-    };
+    
     return this.http.get<string[]>(`${this.allSchedulesURL}`, httpOptions)
     .pipe(
       catchError(this.handleError)
@@ -71,27 +65,35 @@ export class AuthenticatedService {
   }
 
   editSchedule(name, newName, description, isPublic, addCourse, deleteCourse):Observable<any>{
-    console.log("put request for adding a course!")
-    let headers: HttpHeaders = new HttpHeaders();
-    headers = headers.append('Accept', 'application/json');
-    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
-    const httpOptions = {
-      headers: headers
-    };
+    console.log("put request for edit a schedule!")
     const body= {
       scheduleName: name.toLocaleUpperCase(),
-      newName: name.toLocaleUpperCase(),
-      description: description.toLocaleUpperCase(),
+      newName: newName,
+      description: description,
       isPublic: isPublic.toLocaleUpperCase(),
       addCourse: addCourse.toLocaleUpperCase(),
       deleteCourse: deleteCourse.toLocaleUpperCase(),
 
     };
-    return this.http.put(`${this.editscheduleURL}`,body,httpOptions)
+    console.log(this.editScheduleURL)
+    return this.http.put(`${this.editScheduleURL}`,body,httpOptions)
     .pipe(
       catchError(this.handleError)
     );
   }
+
+  addReview(courseName, review):Observable<any>{
+    const body= {
+      courseName: courseName,
+      review: review
+    };
+    console.log(body)
+    return this.http.put(`${this.addReviewURL}`,body,httpOptions)
+    .pipe(
+      catchError(this.handleError)
+    );
+  }
+
 
   handleError(err) {
     let errorMessage = '';

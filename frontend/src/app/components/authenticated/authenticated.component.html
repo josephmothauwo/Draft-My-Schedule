@@ -6,26 +6,49 @@
     Description: <input #description type="text">
     Do you want it to be public?<input #public type="text">
     <button (click) ="putScheduleName(scheduleName.value, description.value, public.value)" >Add Schedule</button>
-    <button (click) ="deleteSchedule(scheduleName.value)">Delete Schedule</button>
-</div>
+    
 
 <div>
     <h2>See schedule summary</h2>
     <button (click)="getAllSchedules()">See summary</button>
-    <!-- <button (click)="deleteAllSchedules()">Delete All Schedules</button> -->
+    <button (click) = "resetSummary()">clear summary</button>
+</div>
     <ol>
         <li *ngFor="let schedule of scheduleSummary" [schedule]="schedule"> Schedule Name: {{schedule[0]}} | Description: {{schedule[1]}} |Amount of Courses: {{schedule[2]}}</li>
     </ol>
+
 </div>
 
 <div>
     <h2>Edit a course List</h2>
     Schedule Name: <input #editScheduleName type="text">
-    New Name: <input #editScheduleName type="text">
+    New Name: <input #newName type="text">
     New Description: <input #editDescription type="text">
     Do you want it to be public Still?<input #editPublic type="text">
     Add Course<input #addCourse type="text">
     Delete Course <input #deleteCourse type="text">
-    <button (click)="editSchedule(editScheduleName, editDescription, editPublic, addCourse, deleteCourse)">Save changes</button>
-    <!-- <button (click)="deleteAllSchedules()">Delete All Schedules</button> -->
+    <button (click)="editSchedule(editScheduleName.value, newName.value, editDescription.value, editPublic.value, addCourse.value, deleteCourse.value)">Save changes</button>
+    
 </div>
+
+<div>
+    <h2>Delete a Course List</h2>
+    Schedule Name: <input #deleteScheduleName type="text">
+    <button (click) = "confirmDelete()">delete</button>
+    <button *ngIf ="confirmDeleteTrigger" (click)="deleteSchedule(deleteScheduleName.value)">confirm delete</button>
+    <button *ngIf ="confirmDeleteTrigger" (click)="declineDelete()">decline delete</button>
+</div>
+
+<div>
+    <h2>Add A course review</h2>
+    Course Name <input #courseName type="text">
+    Review <input #review type="text">
+    <button *ngIf = "!confirmReviewTrigger" (click) = "confirmReview()">Add Review</button>
+    <button *ngIf = "confirmReviewTrigger" (click) = "addReview(courseName.value, review.value)">Are you sure you want to save this Review</button>
+    <button *ngIf = "confirmReviewTrigger" (click) = "declineReview()"> decline confirmation</button>
+    
+</div>
+    
+    
+
+
