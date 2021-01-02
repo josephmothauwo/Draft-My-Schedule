@@ -165,6 +165,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
               "start_time" : course["course_info"][0]["start_time"],
               "end_time" : course["course_info"][0]["end_time"],
               "days" : course["course_info"][0]["days"],
+              "facility_ID": course["course_info"][0]["facility_ID"],
               "reviews": courseReviews
             })
           }
@@ -199,6 +200,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
           "start_time" : course["course_info"][0]["start_time"],
           "end_time" : course["course_info"][0]["end_time"],
           "days" : course["course_info"][0]["days"],
+          "facility_ID": ocurse["course_info"][0]["facility_ID"],
           "reviews" : courseReviews
         })
       }
@@ -235,6 +237,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
                 "start_time" : course["course_info"][0]["start_time"],
                 "end_time" : course["course_info"][0]["end_time"],
                 "days" : course["course_info"][0]["days"],
+                "facility_ID": course["course_info"][0]["facility_ID"],
                 "reviews" : courseReviews
               })
             }
@@ -581,6 +584,7 @@ router.put('/editSchedule', verifyToken, (req, res) => {
             "start_time" : course["course_info"][0]["start_time"],
             "end_time" : course["course_info"][0]["end_time"],
             "days" : course["course_info"][0]["days"],
+            "facility_ID": course["course_info"][0]["facility_ID"]
           })
           isCourse = true
         }

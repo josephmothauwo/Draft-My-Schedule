@@ -21,7 +21,7 @@
         </ol> -->
         <mat-expansion-panel *ngFor="let courseComponent of allCourseComponents">
             <mat-expansion-panel-header>
-                <mat-panel-title>{{courseComponent.subject}} | {{courseComponent.catalog_nbr}} | {{courseComponent.className}} | Days: {{courseComponent.days}} | Start Time: {{courseComponent.start_time}} | Location: {{courseComponent.facility_ID}} | Type: {{courseComponent.ssr_component}}</mat-panel-title>
+                <mat-panel-title>{{courseComponent.subject}} | {{courseComponent.catalog_nbr}} | {{courseComponent.className}} | Days: {{courseComponent.days}} | Start Time: {{courseComponent.start_time}} | End Time: {{courseComponent.end_time}} | Location: {{courseComponent.facility_ID}} | Type: {{courseComponent.ssr_component}}</mat-panel-title>
             <mat-panel-description></mat-panel-description>
             </mat-expansion-panel-header>
             <p *ngFor = "let review of courseComponent.reviews">Review: {{review.review}} || Username: {{review.userName}} || Date: {{review.creationDate}}</p>
@@ -35,7 +35,7 @@
 
         <mat-expansion-panel *ngFor="let searchItem of keyWordSearchItems">
             <mat-expansion-panel-header>
-                <mat-panel-title>{{searchItem.subject}} | {{searchItem.catalog_nbr}} | {{searchItem.className}} | Days: {{searchItem.days}} | Start Time: {{searchItem.start_time}} | Location: {{searchItem.facility_ID}} | Type: {{searchItem.ssr_component}}</mat-panel-title>
+                <mat-panel-title>{{searchItem.subject}} | {{searchItem.catalog_nbr}} | {{searchItem.className}} | Days: {{searchItem.days}} | Start Time: {{searchItem.start_time}} | End Time: {{searchItem.end_time}} | Location: {{searchItem.facility_ID}} | Type: {{searchItem.ssr_component}}</mat-panel-title>
                 <mat-panel-description></mat-panel-description>
             </mat-expansion-panel-header>
             <p *ngFor = "let review of searchItem.reviews">Review: {{review.review}} || Username: {{review.userName}} || Date: {{review.creationDate}}</p>
@@ -52,7 +52,14 @@
                 </mat-panel-description>
             </mat-expansion-panel-header>
             <p>Description: {{schedule.description}}</p>
-            <p *ngFor = "let course of schedule.courses">{{course.subject}} | {{course.catalog_nbr}} | {{course.className}} | Days: {{course.days}} | Start Time: {{course.start_time}} | Location: {{course.facility_ID}} | Type: {{course.ssr_component}}</p>
+            <mat-expansion-panel *ngFor = "let course of schedule.courses">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Subject: {{course.subject}} | Course Number: {{course.catalog_nbr}} | Class Name: {{course.className}}</mat-panel-title>
+                    <mat-panel-description>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p> Days: {{course.days}} | Start Time: {{course.start_time}} | End Time: {{course.end_time}} | Location: {{course.facility_ID}} | Type: {{course.ssr_component}}</p>
+            </mat-expansion-panel>
         </mat-expansion-panel>
     </div>
    
