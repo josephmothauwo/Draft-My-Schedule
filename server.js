@@ -142,27 +142,31 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
   
   // filter course codes
   
- 
-  // 2 different cases if the coursecomponent is given 
   tableEntry = []
   if(!req.params.course_code){
-    // console.log("hello")
     if(validate(req.params.subject) || sanitization(req.params.subject)){
       res.status(404).send('invalid input')
     }
     const subject = strip(req.params.subject)
       for(course of courses){
-          if(subject === course["subject"]){
-              tableEntry.push({
-                "catalog_nbr" : course["catalog_nbr"].toString(),
-                "subject" : course["subject"], 
-                "className" : course["className"], 
-                "class_section" : course["course_info"][0]["class_section"],  
-                "ssr_component" : course["course_info"][0]["ssr_component"],
-                "start_time" : course["course_info"][0]["start_time"],
-                "end_time" : course["course_info"][0]["end_time"],
-                "days" : course["course_info"][0]["days"],
-              })
+        courseReviews = []
+        for(review of reviews){
+          if(course['catalog_nbr'].toString().toUpperCase() == review["catalog_nbr"].toUpperCase() && course['subject'].toString().toUpperCase() == review["subject"].toUpperCase() && !review["isHidden"]){
+            courseReviews.push(review)
+          }
+        }
+        if(subject === course["subject"]){
+            tableEntry.push({
+              "catalog_nbr" : course["catalog_nbr"].toString(),
+              "subject" : course["subject"], 
+              "className" : course["className"], 
+              "class_section" : course["course_info"][0]["class_section"],  
+              "ssr_component" : course["course_info"][0]["ssr_component"],
+              "start_time" : course["course_info"][0]["start_time"],
+              "end_time" : course["course_info"][0]["end_time"],
+              "days" : course["course_info"][0]["days"],
+              "reviews": courseReviews
+            })
           }
       }
   }
@@ -173,7 +177,6 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
     }
     const course_code = strip(req.params.course_code)
     for(course of courses){
-     
       let flag = true
       for(let i = 0; i < course_code.length; i++){
         if (course_code[i] != course["catalog_nbr"].toString()[i]){
@@ -181,16 +184,23 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
         }
       }
       if(flag){
-          tableEntry.push({
-            "catalog_nbr" : course["catalog_nbr"].toString(),
-            "subject" : course["subject"], 
-            "className" : course["className"], 
-            "class_section" : course["course_info"][0]["class_section"],  
-            "ssr_component" : course["course_info"][0]["ssr_component"],
-            "start_time" : course["course_info"][0]["start_time"],
-            "end_time" : course["course_info"][0]["end_time"],
-            "days" : course["course_info"][0]["days"],
-          })
+        courseReviews = []
+        for(review of reviews){
+          if(course['catalog_nbr'].toString().toUpperCase() == review["catalog_nbr"].toUpperCase() && course['subject'].toString().toUpperCase() == review["subject"].toUpperCase() && !review["isHidden"]){
+            courseReviews.push(review)
+          }
+        }
+        tableEntry.push({
+          "catalog_nbr" : course["catalog_nbr"].toString(),
+          "subject" : course["subject"], 
+          "className" : course["className"], 
+          "class_section" : course["course_info"][0]["class_section"],  
+          "ssr_component" : course["course_info"][0]["ssr_component"],
+          "start_time" : course["course_info"][0]["start_time"],
+          "end_time" : course["course_info"][0]["end_time"],
+          "days" : course["course_info"][0]["days"],
+          "reviews" : courseReviews
+        })
       }
     }
   }
@@ -203,24 +213,31 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
       const subject = strip(req.params.subject)
       for(course of courses){
           if(subject === course["subject"]){
-              let flag = true
-              for(let i = 0; i < course_code.length; i++){
-                if (course_code[i] != course["catalog_nbr"].toString()[i]){
-                  flag = false
+            let flag = true
+            for(let i = 0; i < course_code.length; i++){
+              if (course_code[i] != course["catalog_nbr"].toString()[i]){
+                flag = false
+              }
+            }
+            if (flag){
+              courseReviews = []
+              for(review of reviews){
+                if(course['catalog_nbr'].toString().toUpperCase() == review["catalog_nbr"].toUpperCase() && course['subject'].toString().toUpperCase() == review["subject"].toUpperCase() && !review["isHidden"]){
+                  courseReviews.push(review)
                 }
               }
-              if (flag){
-                tableEntry.push({
-                  "catalog_nbr" : course["catalog_nbr"].toString(),
-                  "subject" : course["subject"], 
-                  "className" : course["className"], 
-                  "class_section" : course["course_info"][0]["class_section"],  
-                  "ssr_component" : course["course_info"][0]["ssr_component"],
-                  "start_time" : course["course_info"][0]["start_time"],
-                  "end_time" : course["course_info"][0]["end_time"],
-                  "days" : course["course_info"][0]["days"],
-                })
-              }
+              tableEntry.push({
+                "catalog_nbr" : course["catalog_nbr"].toString(),
+                "subject" : course["subject"], 
+                "className" : course["className"], 
+                "class_section" : course["course_info"][0]["class_section"],  
+                "ssr_component" : course["course_info"][0]["ssr_component"],
+                "start_time" : course["course_info"][0]["start_time"],
+                "end_time" : course["course_info"][0]["end_time"],
+                "days" : course["course_info"][0]["days"],
+                "reviews" : courseReviews
+              })
+            }
           }
       }
   }
@@ -235,7 +252,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
 router.get('/keyword/:keyword', (req, res) => {
   keyword = req.params.keyword
   tableEntry = []
-  
+  console.log("get request for keywords")
   if(keyword.length < 4){
     console.log(keyword.length)
     return res.status(404).send("word must be longer than 4 characters")
@@ -243,6 +260,12 @@ router.get('/keyword/:keyword', (req, res) => {
   
   for(course of courses){
     if(stringSimilarity.compareTwoStrings(course['catalog_nbr'].toString(), keyword) > 0.6 || stringSimilarity.compareTwoStrings(course['className'], keyword) > 0.6){
+      courseReviews = []
+      for(review of reviews){
+        if(course['catalog_nbr'].toString().toUpperCase() == review["catalog_nbr"].toUpperCase() && course['subject'].toString().toUpperCase() == review["subject"].toUpperCase() && !review["isHidden"]){
+          courseReviews.push(review)
+        }
+      }
       tableEntry.push({
         "catalog_nbr" : course["catalog_nbr"].toString(),
         "subject" : course["subject"], 
@@ -252,6 +275,7 @@ router.get('/keyword/:keyword', (req, res) => {
         "start_time" : course["course_info"][0]["start_time"],
         "end_time" : course["course_info"][0]["end_time"],
         "days" : course["course_info"][0]["days"],
+        "reviews" : courseReviews
       })
     }
   }
@@ -580,7 +604,7 @@ router.put('/editSchedule', verifyToken, (req, res) => {
     });
   res.send(currSchedule) 
 });
-
+// add review to course
 router.put('/addReview', verifyToken, (req, res) => {
   console.log("get put request to get add review!")
   if(validate(req.body.courseName) || sanitization(req.body.courseName) || validate(req.body.review) || sanitization(req.body.review) || req.body.courseName.split(" ").length != 2){
@@ -598,10 +622,13 @@ router.put('/addReview', verifyToken, (req, res) => {
         var day = String(today.getDate()).padStart(2, '0');
         var month = String(today.getMonth() + 1).padStart(2, '0');
         var year = today.getFullYear();
-        today = month + '/' + day + '/' + year;
+        var hours = today.getHours()
+        var minutes = today.getMinutes()
+        today = month + '/' + day + '/' + year + " - " + hours + ":" + minutes;
         reviews.push({
           subject: course["subject"],
           catalog_nbr: course["catalog_nbr"].toString(),
+          review: req.body.review, 
           isHidden: false, 
           reviewID : reviews.length + 1,
           userName: req.user["username"],

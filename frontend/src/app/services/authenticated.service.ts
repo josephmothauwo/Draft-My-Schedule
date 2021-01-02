@@ -87,7 +87,6 @@ export class AuthenticatedService {
       courseName: courseName,
       review: review
     };
-    console.log(body)
     return this.http.put(`${this.addReviewURL}`,body,httpOptions)
     .pipe(
       catchError(this.handleError)
