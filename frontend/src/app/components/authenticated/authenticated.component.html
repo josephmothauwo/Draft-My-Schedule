@@ -1,4 +1,5 @@
-
+<router-outlet></router-outlet>
+<button routerLink="">Back home</button>
 <div>
     <h2>Make a Schedule</h2>
     Schedule Name: <input #scheduleName type="text">
@@ -15,4 +16,16 @@
     <ol>
         <li *ngFor="let schedule of scheduleSummary" [schedule]="schedule"> Schedule Name: {{schedule[0]}} | Description: {{schedule[1]}} |Amount of Courses: {{schedule[2]}}</li>
     </ol>
+</div>
+
+<div>
+    <h2>Edit a course List</h2>
+    Schedule Name: <input #editScheduleName type="text">
+    New Name: <input #editScheduleName type="text">
+    New Description: <input #editDescription type="text">
+    Do you want it to be public Still?<input #editPublic type="text">
+    Add Course<input #addCourse type="text">
+    Delete Course <input #deleteCourse type="text">
+    <button (click)="editSchedule(editScheduleName, editDescription, editPublic, addCourse, deleteCourse)">Save changes</button>
+    <!-- <button (click)="deleteAllSchedules()">Delete All Schedules</button> -->
 </div>

@@ -12,6 +12,8 @@ headers = headers.append('Accept', 'application/json');
 export class AuthenticatedService {
   scheduleNameURL: string = 'http://localhost:3000/UA/schedules/';
   allSchedulesURL: string = 'http://localhost:3000/UA/all_schedules';
+  addCourseURL: string = '/http://localhost:3000/UA/schedule/courses';
+  editscheduleURL: string = '/http://localhost:3000/UA/editSchedule';
   // scheduleNameURL: string = '/api/schedules/';
   constructor(private http:HttpClient) { }
 
@@ -44,6 +46,48 @@ export class AuthenticatedService {
       headers: headers
     };
     return this.http.get<string[]>(`${this.allSchedulesURL}`, httpOptions)
+    .pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  putCourse(subject:string, courseCode:string, scheduleName:string):Observable<any>{
+    console.log("put request for adding a course!")
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
+    const body= {
+      scheduleName: scheduleName.toLocaleUpperCase(),
+      subjectNames: subject.toLocaleUpperCase(),
+      courseNumbers: courseCode.toLocaleUpperCase()
+    };
+    return this.http.put(`${this.addCourseURL}`,body,httpOptions)
+    .pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  editSchedule(name, newName, description, isPublic, addCourse, deleteCourse):Observable<any>{
+    console.log("put request for adding a course!")
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
+    const body= {
+      scheduleName: name.toLocaleUpperCase(),
+      newName: name.toLocaleUpperCase(),
+      description: description.toLocaleUpperCase(),
+      isPublic: isPublic.toLocaleUpperCase(),
+      addCourse: addCourse.toLocaleUpperCase(),
+      deleteCourse: deleteCourse.toLocaleUpperCase(),
+
+    };
+    return this.http.put(`${this.editscheduleURL}`,body,httpOptions)
     .pipe(
       catchError(this.handleError)
     );

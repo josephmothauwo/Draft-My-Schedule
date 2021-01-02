@@ -1,15 +1,13 @@
 <body>
-    <button routerLink="register">register</button>
+    <button routerLink="register">Back Home</button>
     <router-outlet></router-outlet>
     <h1>Draft My Schedule!!!!</h1>
 <h2>This site is a replica of draft my schedule. It will allow you to see publically accessible scheduales and login to make your own scheduales. Administrators can also log in and make various changes to user profiles</h2>
 <div>
     <h2>Login</h2>
     <span>
-        <form name="myForm">
-            email: <input #email type="email">
-            Password: <input #password type="text">
-        </form>
+        email: <input #email type="email">
+        Password: <input #password type="text">
         <button  (click)="login(email.value,password.value) ">Login</button>
         <p  *ngIf="sentBack!=null && sentBack.user.isVerified && !sentBack.user.isDeactivated" >You have been logged in! Click here to continue</p>
         <p  *ngIf="sentBack!=null && !sentBack.user.isVerified" >You are not Verified</p> 

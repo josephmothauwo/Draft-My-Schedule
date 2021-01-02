@@ -13,9 +13,10 @@ export class AuthenticatedComponent implements OnInit {
   ngOnInit(): void {
   }
   putScheduleName(name:string, description:string, isPublic:string){
-    if(isPublic.toLocaleLowerCase() != "YES"){
+    if(isPublic.toLocaleUpperCase() != "YES"){
       isPublic = "False"
     }
+    console.log(isPublic)
     this.AuthenticatedService.putScheduleName(name, description, isPublic,localStorage.getItem('currentToken')).subscribe(schedule => {
       console.log(schedule);
     });
@@ -32,5 +33,11 @@ export class AuthenticatedComponent implements OnInit {
       this.scheduleSummary = schedule
     });
   }
+  editSchedule(name, description, isPublic, addCourse, deleteCourse){
+    this.AuthenticatedService.editSchedule(name, newName, description, isPublic, addCourse, deleteCourse).subscribe(schedule => {
+      
+    });
+  }
+
 
 }

@@ -48,21 +48,6 @@ app.use(passport.session())
 router.use(express.json());
 app.use('/UA', router);
 
-// router.post('/login', (req, res)=>{
-//     // console.log(req.user)
-//     // res.send(req.headers['authorization'])
-//     const user = {
-//       id: 1,
-//       username: "joey",
-//       email: "hello@gmail.com"
-//     }
-//     jwt.sign({user: user}, "secretkey", (err, token) => {
-//       res.json({
-//         tokem: token
-//       })
-//     })
-
-// })
 
 router.get("/confirmation/:token", (req,res)=>{
   jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -243,6 +228,8 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
   res.send(tableEntry)
 });
 
+
+
 router.get('/keyword/:keyword', (req, res) => {
   keyword = req.params.keyword
   tableEntry = []
@@ -346,7 +333,7 @@ router.post('/login', function (req, res, next){
 
 // add a new schdeule to the schdeules json file
 router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (req, res) => {
-  console.log(req.description, "hello")
+  
   console.log(req.params.schedule_name, req.params.description, req.params.isPublic)
   if(validate(req.params.schedule_name) || sanitization(req.params.schedule_name)){
       res.status(404).send('invalid Input')
@@ -373,7 +360,7 @@ router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (re
       return
     }
     else{
-      isPublic = strip(req.params.isPublic)
+      isPublic = strip(req.params.isPublic).toUpperCase()
     }
   }
   const schedule_name = strip(req.params.schedule_name)
@@ -382,7 +369,7 @@ router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (re
       res.status(404).send('Name is already present or invalid name')
       return
   }
-  const publicSched = false
+  let publicSched = false
   if(isPublic == "YES"){
     publicSched = true
   }
@@ -390,7 +377,9 @@ router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (re
       name: schedule_name,
       description: description,
       isPublic: publicSched,
-      email: req.user["email"], 
+      email: req.user["email"],
+      username: req.user["username"],
+      lastUpdated: new Date(), 
       courses: [] 
   }
   schedules.push(newSchedule)
@@ -426,6 +415,117 @@ router.get('/all_schedules',verifyToken, (req, res) => {
       }
     }
   res.send(scheduleSummary)
+});
+
+router.get('/publicSchedules', (req, res) => {
+  console.log(`GET request from ${req.url}`);
+  userEmail = req.user["email"]
+  let scheduleSummary = []
+  for(schedule of schedules){
+      if (userEmail.toUpperCase() == schedule["email"].toUpperCase()){
+        scheduleSummary.push([schedule["name"],schedule["description"],schedule["courses"].length])
+      }
+    }
+  res.send(scheduleSummary)
+});
+
+// add courses to a specific schedule
+router.put('/editSchedule', verifyToken, (req, res) => {
+  // console.log(req.body.scheduleName,req.body.subjectNames, req.body.courseNumbers)
+  if(validate(req.body.scheduleName) || validate(req.body.scheduleName)){
+      res.status(400).send('invalid input')
+      return 
+  }
+  if(req.body.newName.deleteCourse > 0){
+    if(validate(req.body.newName) || validate(req.body.newName) ){
+    res.status(400).send('invalid input')
+    return 
+    } 
+  }
+  if(req.body.description.length > 0){
+    if(validate(req.body.description) || validate(req.body.description) ){
+    res.status(400).send('invalid input')
+    return 
+    } 
+  }
+  if(req.body.isPublic.length > 0){
+    if(validate(req.body.isPublic) || validate(req.body.isPublic) ){
+    res.status(400).send('invalid input')
+    return 
+    } 
+  }
+  if(req.body.addCourse.length > 0){
+    if(validate(req.body.addCourse) || validate(req.body.addCourse) ){
+    res.status(400).send('invalid input')
+    return 
+    } 
+  }
+
+  if(req.body.deleteCourse.length > 0){
+    if(validate(req.body.deleteCourse) || validate(req.body.deleteCourse) ){
+    res.status(400).send('invalid input')
+    return 
+    } 
+  }
+
+  const scheduleName = req.body.scheduleName
+  const newName = req.body.newName
+  const description = req.body.description
+  const isPublic = req.body.newName
+  const addCourse = req.body.addCourse
+  const deleteCourse = req.body.newName
+  let currSchedule = null
+  for(schedule of schedules){
+    if(scheduleName == schedule.["name"]){
+      currSchedule = schedule
+    }
+  }
+  if (currSchedule == null){
+    return res.status(404).send("no schedule with that name")
+  }
+  const subjectsArray = subjectNames.split(" ")
+  const courseNumberArray = courseNumbers.split(" ")
+
+  
+  for(let i = 0; i<subjectsArray.length;i++){
+      var flag2 = true
+      for(let j = 0;j<courses.length;j++){
+          if(subjectsArray[i]===courses[j].subject && courseNumberArray[i]===courses[j].catalog_nbr.toString()){
+              flag2 = false
+          }
+      }
+      if(flag2){
+          res.status(404).send('invalid input')
+      return 
+      }
+
+  }
+  
+  if(scheduleNum < 0 || subjectsArray.length!=courseNumberArray.length){
+      console.log(scheduleNum)
+      res.status(400).send('schedule is not present')
+      return
+  }
+  // check if items are in the schdeule already or not
+  else{
+      for(let i=0;i<subjectsArray.length;i++){
+          var flag = true;
+          for(let j=0;j<schedules[scheduleNum].courses.length;j++){
+              if(subjectsArray[i] === schedules[scheduleNum].courses[j][0] && courseNumberArray[i] === schedules[scheduleNum].courses[j][1]){
+                  schedules[scheduleNum].courses[j]=([subjectsArray[i],courseNumberArray[i]])
+                  flag = false
+              }
+          }
+          if(flag){
+              schedules[scheduleNum].courses.push([subjectsArray[i],courseNumberArray[i]])
+          }
+      }
+  }
+  var data = JSON.stringify(schedules, null, 2)
+  fs.writeFile('schedules.json', data, (err) => {
+      if (err) throw err;
+    });
+  res.send(schedules[scheduleNum]) 
 });
 
 
