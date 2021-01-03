@@ -661,6 +661,10 @@ router.put('/addReview', verifyToken, (req, res) => {
 });
 
 router.put('/givePriveleges', verifyToken, (req, res) => {
+  if(validate(req.body.email) || sanitizationEmail(req.body.email)){
+    res.status(400).send('invalid input')
+    return 
+  }
   console.log("put request to change priveleges")
   console.log(req.body.email)
   var currUser = null
@@ -679,7 +683,89 @@ router.put('/givePriveleges', verifyToken, (req, res) => {
 
 });
 
+router.put('/hideReview', verifyToken, (req, res) => {
+  console.log("put request to hide review")
+  if(sanitization(req.body.id)){
+    res.status(400).send('invalid input')
+    return 
+  }
+  var currReview = null
+  for(review of reviews){
+    if(review.reviewID.toString() == req.body.id){
+      review.isHidden = true
+      currReview = review
+    }
+  }
+  if(!currReview) res.status(404).send("review not found")
+  var data = JSON.stringify(reviews, null, 2)
+  fs.writeFile('reviews.json', data, (err) => {
+    if (err) throw err;
+  });
+  res.send(currReview) 
+});
 
+router.put('/showReview', verifyToken, (req, res) => {
+  console.log("put request to hide review")
+  if(sanitization(req.body.id)){
+    res.status(400).send('invalid input')
+    return 
+  }
+  var currReview = null
+  for(review of reviews){
+    if(review.reviewID.toString() == req.body.id){
+      review.isHidden = false
+      currReview = review
+    }
+  }
+  if(!currReview) res.status(404).send("review not found")
+  var data = JSON.stringify(reviews, null, 2)
+  fs.writeFile('reviews.json', data, (err) => {
+    if (err) throw err;
+  });
+  res.send(currReview) 
+});
+
+router.put('/deactivate', verifyToken, (req, res) => {
+  console.log("put request to deactivate user")
+  if(sanitizationEmail(req.body.email) || validate(req.body.email)){
+    res.status(400).send('invalid input')
+    return 
+  }
+  var currUser = null
+  for(user of users){
+    if(user.email.toUpperCase() == req.body.email.toUpperCase()){
+      user.isDeactivated = true
+      currUser = user
+    }
+  }
+  if(!currUser) res.status(404).send("user not found")
+  var data = JSON.stringify(users, null, 2)
+  fs.writeFile('users.json', data, (err) => {
+    if (err) throw err;
+  });
+  res.send(currUser) 
+});
+
+router.put('/reactivate', verifyToken, (req, res) => {
+  console.log("put request to deactivate user")
+  if(sanitizationEmail(req.body.email) || validate(req.body.email)){
+    res.status(400).send('invalid input')
+    return 
+  }
+  var currUser = null
+  for(user of users){
+    if(user.email.toUpperCase() == req.body.email.toUpperCase()){
+      user.isDeactivated = false
+      currUser = user
+    }
+  }
+  if(!currUser) res.status(404).send("user not found")
+  var data = JSON.stringify(users, null, 2)
+  fs.writeFile('users.json', data, (err) => {
+    if (err) throw err;
+  });
+  res.send(currUser) 
+});
 
 function validate(inputString){
   return ((inputString.length<2) || (inputString.length>20))
@@ -688,6 +774,18 @@ function validate(inputString){
 
 function sanitization(inputString){
   const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/g;
+  const output = inputString.replace(format, "");
+
+  if (inputString  === output){
+      return false
+  }
+  else{
+      return true;
+  }
+}
+
+function sanitizationEmail(inputString){
+  const format = /[`!#$%^&*()_+\-=\[\]{};':"\\|,<>\/?~]/g;
   const output = inputString.replace(format, "");
 
   if (inputString  === output){

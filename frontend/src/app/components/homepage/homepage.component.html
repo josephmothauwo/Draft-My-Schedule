@@ -25,7 +25,7 @@
                 <mat-panel-title>{{courseComponent.subject}} | {{courseComponent.catalog_nbr}} | {{courseComponent.className}} | Days: {{courseComponent.days}} | Start Time: {{courseComponent.start_time}} | End Time: {{courseComponent.end_time}} | Location: {{courseComponent.facility_ID}} | Type: {{courseComponent.ssr_component}}</mat-panel-title>
             <mat-panel-description></mat-panel-description>
             </mat-expansion-panel-header>
-            <p *ngFor = "let review of courseComponent.reviews">Review: {{review.review}} || Username: {{review.userName}} || Date: {{review.creationDate}}</p>
+            <p *ngFor = "let review of courseComponent.reviews">Review: {{review.review}} || Username: {{review.userName}} || Date: {{review.creationDate}} || Review ID: {{review.reviewID}}</p>
             </mat-expansion-panel>
         <h2>Find courses by Keyword</h2>
         <span>

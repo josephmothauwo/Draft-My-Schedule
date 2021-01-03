@@ -3,6 +3,21 @@
 <h3>Admin Page</h3>
 
 <span>
+    <h1>Give a user Admin priveleges</h1>
     email of user: <input #email type="email">
     <button (click)="givePriveleges(email.value)">Give Priveleges</button>
+</span>
+
+<span>
+    <h1>Hide a review: please enter the review ID</h1>
+    Review ID: <input #ID type="email">
+    <button (click)="hideReview(ID.value)">Hide review</button>
+    <button (click)="showReview(ID.value)">Show Review </button>
+</span>
+
+<span>
+    <h1>Mark user as deactivated</h1>
+    User email: <input #deactivateEmail type="email">
+    <button (click)="decactivateUser(deactivateEmail.value)">Deactivate</button>
+    <button (click)="reactivateUser(deactivateEmail.value)">Reactivate</button>
 </span>
