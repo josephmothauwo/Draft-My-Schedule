@@ -13,6 +13,7 @@ export class AdminService {
   showReviewURL: string = 'http://localhost:3000/UA/showReview';
   deactivateURL: string = 'http://localhost:3000/UA/deactivate';
   reactivateURL: string = 'http://localhost:3000/UA/reactivate';
+  policyURL: string = 'http://localhost:3000/UA/policy';
   constructor(private http:HttpClient) { }
   givePriveleges(email:string):Observable<any>{
     console.log(localStorage.getItem('currentToken'))
@@ -94,6 +95,23 @@ export class AdminService {
       email:email
     };
     return this.http.put(`${this.reactivateURL}`,body, httpOptions)
+    .pipe(
+      catchError(this.handleError)
+    );
+  }
+  updatePolicy(policy:string, policyName: string):Observable<any>{
+    console.log(localStorage.getItem('currentToken'))
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
+    const body= {
+      policy:policy,
+      policyName: policyName
+    };
+    return this.http.put(`${this.policyURL}`,body, httpOptions)
     .pipe(
       catchError(this.handleError)
     );

@@ -20,6 +20,8 @@ var schdeulesData = fs.readFileSync("schedules.json")
 var schedules = JSON.parse(schdeulesData)
 var reviewsData = fs.readFileSync("reviews.json")
 var reviews = JSON.parse(reviewsData)
+var policiesData = fs.readFileSync("policies.json")
+var policies = JSON.parse(policiesData)
 const PORT = 3000
 const cors = require('cors');
 const { verify } = require('crypto');
@@ -434,7 +436,7 @@ function verifyToken(req, res, next) {
   const token = tokenHeader[1]
   console.log(token, "hellooo")
   if (token == null) return res.sendStatus(401)
-  
+  console.log(req.user)
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403)
     req.user = user
@@ -767,6 +769,29 @@ router.put('/reactivate', verifyToken, (req, res) => {
   res.send(currUser) 
 });
 
+router.put('/policy', verifyToken, (req, res) => {
+  console.log("put request to policy update")
+  if(sanitizationPolicy(req.body.policy)){
+    res.status(400).send('invalid input')
+    return 
+  }
+  for(policy of policies){
+    if (req.body.policyName.toUpperCase() == policy.policyName.toUpperCase()){
+      policy["policy"] = req.body.policy
+    }
+  }
+  var data = JSON.stringify(policies, null, 2)
+  fs.writeFile('policies.json', data, (err) => {
+    if (err) throw err;
+  });
+  res.send([req.body.policy]) 
+});
+
+router.get('/getPolicies', (req, res) => {
+  console.log("put request to get policies")
+  res.send(policies) 
+});
+
 function validate(inputString){
   return ((inputString.length<2) || (inputString.length>20))
 }
@@ -786,6 +811,18 @@ function sanitization(inputString){
 
 function sanitizationEmail(inputString){
   const format = /[`!#$%^&*()_+\-=\[\]{};':"\\|,<>\/?~]/g;
+  const output = inputString.replace(format, "");
+
+  if (inputString  === output){
+      return false
+  }
+  else{
+      return true;
+  }
+}
+
+function sanitizationPolicy(inputString){
+  const format = /[`#$%^&*()_+\-=\[\]{}'"\\|,<>\/?~]/g;
   const output = inputString.replace(format, "");
 
   if (inputString  === output){

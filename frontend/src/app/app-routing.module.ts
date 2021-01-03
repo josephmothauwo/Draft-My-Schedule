@@ -7,6 +7,7 @@ import { ValidatedComponent } from './components/validated/validated.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
 import { AuthenticatedComponent } from './components/authenticated/authenticated.component';
 import { AdminComponent } from './components/admin/admin.component';
+import { PrivacyComponent } from './components/privacy/privacy.component';
 
 
 
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path:  'validatedUser', component:  ValidatedUserComponent},
   { path:  'authenticated', component:  AuthenticatedComponent},
   { path:  'admin', component:  AdminComponent},
+  { path:  'privacy', component:  PrivacyComponent},
   {path: '**', redirectTo: ""}
 ];
 

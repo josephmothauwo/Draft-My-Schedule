@@ -37,6 +37,12 @@ export class AdminComponent implements OnInit {
       console.log(review)
     });
   }
+  updatePolicy(policy:string, policyName: string){
+    console.log(policyName)
+    this.AdminService.updatePolicy(policy, policyName).subscribe(policy => {
+      console.log(policy)
+    });
+  }
 
 
 }

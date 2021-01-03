@@ -40,6 +40,7 @@ import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import { AuthenticatedComponent } from './components/authenticated/authenticated.component';
 import { AdminComponent } from './components/admin/admin.component';
+import { PrivacyComponent } from './components/privacy/privacy.component';
 
 
 
@@ -52,7 +53,8 @@ import { AdminComponent } from './components/admin/admin.component';
     ValidatedUserComponent,
     HomepageComponent,
     AuthenticatedComponent,
-    AdminComponent
+    AdminComponent,
+    PrivacyComponent
   ],
   imports: [
     BrowserModule,

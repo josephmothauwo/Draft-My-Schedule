@@ -1,4 +1,5 @@
 
+<router-outlet></router-outlet>
 <button routerLink="">Back Home</button>
 <h3>Admin Page</h3>
 
@@ -14,10 +15,24 @@
     <button (click)="hideReview(ID.value)">Hide review</button>
     <button (click)="showReview(ID.value)">Show Review </button>
 </span>
-
 <span>
     <h1>Mark user as deactivated</h1>
     User email: <input #deactivateEmail type="email">
     <button (click)="decactivateUser(deactivateEmail.value)">Deactivate</button>
     <button (click)="reactivateUser(deactivateEmail.value)">Reactivate</button>
+</span>
+<span>
+    <h1>Update Security and privacy policy</h1>
+    Updated Policy <textarea #privacyPolicy type=""> </textarea>
+    <button (click)="updatePolicy(privacyPolicy.value, 'security')">Update</button>
+</span>
+<span>
+    <h1>DMCA notice and takedown policy</h1>
+    Updated Policy <textarea #DMCA type=""> </textarea>
+    <button (click)="updatePolicy(DMCA.value, 'DMCA')">Update</button>
+</span>
+<span>
+    <h1>Acceptable use policy</h1>
+    Updated Policy <textarea #aup type=""> </textarea>
+    <button (click)="updatePolicy(aup.value, 'aup')">Update</button>
 </span>

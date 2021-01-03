@@ -3,6 +3,7 @@
 <button *ngIf="token != null " routerLink="authenticated">authenticated</button>
 <button *ngIf="token != null" (click) = "logout()">logout</button>
 <button *ngIf="admin != null" routerLink="admin">Admin Priveleges</button>
+<button  routerLink="privacy">Privacy Policy</button>
     <router-outlet></router-outlet>
     <h1>Draft My Schedule!!!!</h1>
 <h2>This site is a replica of draft my schedule. It will allow you to see publically accessible scheduales and login to make your own scheduales. Administrators can also log in and make various changes to user profiles</h2>
