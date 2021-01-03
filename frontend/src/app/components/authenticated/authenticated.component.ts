@@ -11,6 +11,7 @@ export class AuthenticatedComponent implements OnInit {
   confirmDeleteTrigger = false
   confirmReviewTrigger = false
   admin = null
+  schedule :string []
   constructor(private AuthenticatedService:AuthenticatedService) { }
 
   ngOnInit(): void {
@@ -67,6 +68,15 @@ export class AuthenticatedComponent implements OnInit {
       localStorage.setItem('currentToken', newToken[0])
       console.log(newToken);
     });
+  }
+  getSchedule(scheduleName:string){
+    this.AuthenticatedService.getSchedule(scheduleName).subscribe(schedule => {
+      console.log(schedule);
+      this.schedule = schedule
+    });
+  }
+  resetSchedule(){
+    this.schedule = null
   }
   
 

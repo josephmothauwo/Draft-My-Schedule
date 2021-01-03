@@ -14,6 +14,7 @@ export class AuthenticatedService {
   editScheduleURL: string = 'http://localhost:3000/UA/editSchedule';
   addReviewURL: string = 'http://localhost:3000/UA/addReview';
   newPasswordURL: string = 'http://localhost:3000/UA/newPassword';
+  getScheduleURL: string = 'http://localhost:3000/UA/schedule/';
   // scheduleNameURL: string = '/api/schedules/';
   constructor(private http:HttpClient) { }
 
@@ -53,6 +54,20 @@ export class AuthenticatedService {
     };
     console.log("get request for all schedules!")
     return this.http.get<string[]>(`${this.allSchedulesURL}`, httpOptions)
+    .pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getSchedule(scheduleName: string):Observable<string[]>{
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Accept', 'application/json');
+    headers = headers.append("Authorization", "Bearer " + localStorage.getItem('currentToken'));
+    const httpOptions = {
+      headers: headers
+    };
+    console.log("get request for one schedule!")
+    return this.http.get<string[]>(`${this.getScheduleURL}${scheduleName}`, httpOptions)
     .pipe(
       catchError(this.handleError)
     );
@@ -136,6 +151,7 @@ export class AuthenticatedService {
       catchError(this.handleError)
     );
   }
+
 
 
   handleError(err) {

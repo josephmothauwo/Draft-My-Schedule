@@ -69,6 +69,7 @@ router.get("/confirmation/:token", (req,res)=>{
 })
 
 router.post('/register', (req,res)=>{
+  
     try{
       if (req.body.email.length == 0 && req.body.password.length == 0){
         res.status(404).send("no email and password given")
@@ -82,6 +83,7 @@ router.post('/register', (req,res)=>{
           res.status(404).send("no email")
           return
         }
+        
         if (req.body.password.length == 0){
           res.status(404).send("no password")
           return
@@ -92,11 +94,17 @@ router.post('/register', (req,res)=>{
             flag = i
           }
         }
-
+        
         if(req.body.email.length - 1 == flag || flag == 0){
           res.status(404).send("not a valid email")
           return
         }
+        
+        if(validate(req.body.email) || sanitizationEmail(req.body.email) || validate(req.body.password) || sanitization(req.body.password) || validate(req.body.username) || sanitization(req.body.username)){
+          res.status(404).send('invalid input or no username')
+          return
+        }
+        console.log("hello")
         const foundUser = users.find(user => user.email.toUpperCase() === req.body.email.toUpperCase());
         if(foundUser){
           res.status(404).send("this email already exisits")
@@ -146,6 +154,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
   if(!req.params.course_code){
     if(validate(req.params.subject) || sanitization(req.params.subject)){
       res.status(404).send('invalid input')
+      return
     }
     const subject = strip(req.params.subject)
       for(course of courses){
@@ -175,6 +184,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
     
     if(validate(req.params.course_code) || sanitization(req.params.course_code)){
       res.status(404).send('invalid input')
+      return
     }
     const course_code = strip(req.params.course_code)
     for(course of courses){
@@ -210,6 +220,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
   else{
       if(validate(req.params.course_code) || sanitization(req.params.course_code) || validate(req.params.subject) || sanitization(req.params.subject)){
           res.status(404).send('invalid input')
+          return
       }
       const course_code = strip(req.params.course_code)
       const subject = strip(req.params.subject)
@@ -268,9 +279,11 @@ router.put('/newPassword', verifyToken, (req, res) => {
   console.log(req.body.newPassword, req.body.confirmedPassword)
   if(validate(req.body.newPassword) || sanitization(req.body.confirmedPassword)){
     res.status(404).send('invalid input')
+    return
   }
   if(req.body.newPassword != req.body.confirmedPassword){
     res.status(404).send('passwords must match!')
+    return
   }
   for(user of users){
     if (req.user["email"].toUpperCase() == user["email"].toUpperCase()){
@@ -324,6 +337,10 @@ router.get('/keyword/:keyword', (req, res) => {
 
 router.post('/login', (req, res) => {
   // call passport authentication passing the "local" strategy name and a callback function
+  if(validate(req.body.email) || sanitizationEmail(req.body.email) || validate(req.body.password) || sanitization(req.body.password)){
+    res.status(404).send('invalid input')
+    return
+  }
   authenticatedUser = null
   for(user of users){
     // console.log(user.password, req.body.password)
@@ -433,9 +450,7 @@ function verifyToken(req, res, next) {
   const authHeader = req.headers['authorization']
   const tokenHeader = authHeader.split(' ')
   const token = tokenHeader[1]
-  console.log(token, "hellooo")
   if (token == null) return res.sendStatus(401)
-  console.log(req.user)
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403)
     req.user = user
@@ -479,6 +494,31 @@ router.get('/all_schedules',verifyToken, (req, res) => {
   res.send(scheduleSummary)
 });
 
+// get one schedules
+router.get('/schedule/:scheduleName',verifyToken, (req, res) => {
+  console.log(`GET request from ${req.url}`);
+  if(validate(req.params.scheduleName) || sanitization(req.params.scheduleName)){
+    res.status(404).send('invalid input')
+    return
+  } 
+  userEmail = req.user["email"]
+  let currSchedule = null
+  for(schedule of schedules){
+      // console.log(userEmail.toUpperCase() , schedule["email"].toUpperCase() , req.params.scheduleName.toUpperCase() , schedule.name.toUpperCase())
+      if(userEmail.toUpperCase() == schedule["email"].toUpperCase() && req.params.scheduleName.toUpperCase() == schedule.name.toUpperCase() ){
+        currSchedule = schedule
+      }
+    }
+  if (currSchedule == null){
+    res.status(404).send("no schedule with that name!")
+    return
+  }
+  else{
+    res.send(currSchedule)
+    return
+  }
+});
+
 router.get('/publicSchedules', (req, res) => {
   console.log(`GET request from ${req.url}`);
   userEmail = req.user["email"]
@@ -490,6 +530,8 @@ router.get('/publicSchedules', (req, res) => {
     }
   res.send(scheduleSummary)
 });
+
+
 
 // edit a schedule
 router.put('/editSchedule', verifyToken, (req, res) => {

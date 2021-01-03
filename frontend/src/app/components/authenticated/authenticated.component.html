@@ -7,7 +7,6 @@
     Description: <input #description type="text">
     Do you want it to be public?<input #public type="text">
     <button (click) ="putScheduleName(scheduleName.value, description.value, public.value)" >Add Schedule</button>
-    
 
 <div>
     <h2>See schedule summary</h2>
@@ -17,7 +16,19 @@
     <ol>
         <li *ngFor="let schedule of scheduleSummary" [schedule]="schedule"> Schedule Name: {{schedule[0]}} | Description: {{schedule[1]}} |Amount of Courses: {{schedule[2]}}</li>
     </ol>
-
+    <div>
+        <h2>See Specific Schedule</h2>
+        Schedule Name: <input #specificScheduleName type="text">
+        <button (click)="getSchedule(specificScheduleName.value)">See Schedule</button>
+        <button (click) = "resetSchedule()">clear schedule</button>
+    </div>
+    <mat-expansion-panel *ngIf = "schedule">
+        <mat-expansion-panel-header>
+            <mat-panel-title>Schedule Name: {{schedule.name}} | Description: {{schedule.description}} | Is Public: {{schedule.isPublic}}</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
+        <p *ngFor = "let course of schedule.courses"> Subject: {{course.subject}} | Course Number: {{course.catalog_nbr}} | Days: {{course.days}} | Start Time: {{course.start_time}} | End Time: {{course.end_time}} | Location: {{course.facility_ID}} | Type: {{course.ssr_component}}</p>
+    </mat-expansion-panel>
 </div>
 
 <div>
