@@ -23,7 +23,6 @@ var reviews = JSON.parse(reviewsData)
 const PORT = 3000
 const cors = require('cors');
 const { verify } = require('crypto');
-
 const router = express.Router();
 
 app.listen(PORT, () => {
@@ -321,7 +320,6 @@ router.get('/keyword/:keyword', (req, res) => {
   console.log(tableEntry)
   return res.send(tableEntry)
 });
-
 
 router.post('/login', (req, res) => {
   // call passport authentication passing the "local" strategy name and a callback function
@@ -662,9 +660,29 @@ router.put('/addReview', verifyToken, (req, res) => {
 
 });
 
+router.put('/givePriveleges', verifyToken, (req, res) => {
+  console.log("put request to change priveleges")
+  console.log(req.body.email)
+  var currUser = null
+  for(user of users){
+    if(user.email.toUpperCase() == req.body.email.toUpperCase()){
+      user.isAdmin = true
+      currUser = user
+    }
+  }
+  if(!currUser) res.status(404).send("user not found")
+  var data = JSON.stringify(users, null, 2)
+  fs.writeFile('users.json', data, (err) => {
+      if (err) throw err;
+    });
+  res.send(currUser) 
 
-  function validate(inputString){
-    return ((inputString.length<2) || (inputString.length>20))
+});
+
+
+
+function validate(inputString){
+  return ((inputString.length<2) || (inputString.length>20))
 }
 
 

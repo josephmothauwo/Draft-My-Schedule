@@ -6,6 +6,7 @@ import { ValidatedUserComponent } from './components/validated-user/validated-us
 import { ValidatedComponent } from './components/validated/validated.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
 import { AuthenticatedComponent } from './components/authenticated/authenticated.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 
 
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path:  'validated', component:  ValidatedComponent},
   { path:  'validatedUser', component:  ValidatedUserComponent},
   { path:  'authenticated', component:  AuthenticatedComponent},
+  { path:  'admin', component:  AdminComponent},
   {path: '**', redirectTo: ""}
 ];
 
