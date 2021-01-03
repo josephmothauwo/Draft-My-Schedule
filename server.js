@@ -349,7 +349,7 @@ router.post('/login', (req, res) => {
   } 
   else if(user.isDeactivated){
 
-    res.status(401).send("not active");
+    res.status(401).send("Your account has been deactivated please the call the admin at: 123-456-7890");
     return
   } 
   else {
