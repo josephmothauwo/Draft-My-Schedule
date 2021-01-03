@@ -28,6 +28,10 @@ export class LoginComponent implements OnInit {
         console.log(this.sentBack.accesstoken)
         localStorage.setItem('currentToken', this.sentBack.accesstoken)
         console.log(localStorage.getItem('currentToken'))
+        console.log(this.sentBack.user)
+        if(this.sentBack.user.isAdmin){
+          localStorage.setItem('admin', "YES")
+        }
       }
     });
   }

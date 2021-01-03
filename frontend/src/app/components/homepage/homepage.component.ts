@@ -14,9 +14,10 @@ export class HomepageComponent implements OnInit {
   keyWordSearchItems: string[];
   courseLists : string[];
   token = null
+  admin = null
   ngOnInit(): void {
-    console.log("hello")
     this.token = localStorage.getItem('currentToken');
+    this.admin = localStorage.getItem('admin')
   }
 
   isAuthenticated(){
@@ -58,5 +59,11 @@ export class HomepageComponent implements OnInit {
   }
   resetPublicCourseLists(){
     this.courseLists = []
+  }
+  logout(){
+    localStorage.removeItem("currentToken");
+    this.token = localStorage.getItem('currentToken')
+    localStorage.removeItem("admin");
+    this.admin = localStorage.getItem('admin')
   }
 }

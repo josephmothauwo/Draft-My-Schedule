@@ -66,5 +66,6 @@ export class AuthenticatedComponent implements OnInit {
       console.log(newToken);
     });
   }
+  
 
 }

@@ -39,6 +39,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatSortModule} from '@angular/material/sort';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import { AuthenticatedComponent } from './components/authenticated/authenticated.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 
 
@@ -50,7 +51,8 @@ import { AuthenticatedComponent } from './components/authenticated/authenticated
     ValidatedComponent,
     ValidatedUserComponent,
     HomepageComponent,
-    AuthenticatedComponent
+    AuthenticatedComponent,
+    AdminComponent
   ],
   imports: [
     BrowserModule,
