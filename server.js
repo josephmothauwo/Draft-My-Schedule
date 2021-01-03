@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== 'production') {
   }  
 const jwt = require('jsonwebtoken')
 const express = require('express')
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcryptjs")
 const stringSimilarity = require('string-similarity');
 var fs = require('fs')
 var usersData = fs.readFileSync("users.json")
@@ -68,7 +68,7 @@ router.get("/confirmation/:token", (req,res)=>{
   })
 })
 
-router.post('/register', async (req,res)=>{
+router.post('/register', (req,res)=>{
     try{
       if (req.body.email.length == 0 && req.body.password.length == 0){
         res.status(404).send("no email and password given")
@@ -103,9 +103,8 @@ router.post('/register', async (req,res)=>{
           return
         }
         
-        
-        const hashedPassword = await bcrypt.hash(req.body.password, 10)
-
+        const hashedPassword = bcrypt.hashSync(req.body.password, 10)
+        console.log(req.body.password,hashedPassword, "this is the hashed password")
         let tempUser = {
           id: Date.now().toString(),
           email: req.body.email, 
@@ -201,7 +200,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
           "start_time" : course["course_info"][0]["start_time"],
           "end_time" : course["course_info"][0]["end_time"],
           "days" : course["course_info"][0]["days"],
-          "facility_ID": ocurse["course_info"][0]["facility_ID"],
+          "facility_ID": course["course_info"][0]["facility_ID"],
           "reviews" : courseReviews
         })
       }
@@ -275,7 +274,7 @@ router.put('/newPassword', verifyToken, (req, res) => {
   }
   for(user of users){
     if (req.user["email"].toUpperCase() == user["email"].toUpperCase()){
-      user["password"] = bcrypt.hash(req.body.newPassword, 10)
+      user["password"] = bcrypt.hashSync(req.body.newPassword, 10)
       newToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
       user["loginToken"] = newToken
       console.log(user)
@@ -325,21 +324,21 @@ router.get('/keyword/:keyword', (req, res) => {
 
 router.post('/login', (req, res) => {
   // call passport authentication passing the "local" strategy name and a callback function
-  console.log(req.body.password)
-  console.log(req.body.email)
   authenticatedUser = null
   for(user of users){
-    if(user.email.toUpperCase() == req.body.email.toUpperCase() && bcrypt.compare(user.email, req.body.password)){
+    // console.log(user.password, req.body.password)
+    console.log(user.email.toUpperCase() , req.body.email.toUpperCase() )
+    if(user.email.toUpperCase() == req.body.email.toUpperCase() && bcrypt.compareSync( req.body.password, user.password)){
       authenticatedUser = user
     }
   }
-  if (!authenticatedUser) res.status(401).send("username or password is wrong")
-  // this will execute in any case, even if a passport strategy will find an error
-  // log everything to console
-  //   console.log(error);
-  console.log(authenticatedUser);
+  if (authenticatedUser == null) {
+    res.status(401).send("username or password is wrong")
+    return
+  }
+  
   //   console.log(info);
-  if(!user.isVerified){
+  else if(!user.isVerified){
     console.log("not verified");
     var sendback = {
       message:"not verified",
@@ -788,7 +787,7 @@ router.put('/policy', verifyToken, (req, res) => {
 });
 
 router.get('/getPolicies', (req, res) => {
-  console.log("put request to get policies")
+  console.log("get request to get policies")
   res.send(policies) 
 });
 

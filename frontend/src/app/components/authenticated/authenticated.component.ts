@@ -10,9 +10,11 @@ export class AuthenticatedComponent implements OnInit {
   scheduleSummary : string[]
   confirmDeleteTrigger = false
   confirmReviewTrigger = false
+  admin = null
   constructor(private AuthenticatedService:AuthenticatedService) { }
 
   ngOnInit(): void {
+    this.admin = localStorage.getItem("admin")
   }
   putScheduleName(name:string, description:string, isPublic:string){
     if(isPublic.toLocaleUpperCase() != "YES"){

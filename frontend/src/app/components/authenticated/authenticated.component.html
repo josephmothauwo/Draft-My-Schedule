@@ -1,5 +1,6 @@
 <router-outlet></router-outlet>
 <button routerLink="">Back home</button>
+<p *ngIf="admin">You are an Admin!</p>
 <div>
     <h2>Make a Schedule</h2>
     Schedule Name: <input #scheduleName type="text">

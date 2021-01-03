@@ -12,7 +12,9 @@ export class PrivacyComponent implements OnInit {
   privacy = null
   DMCA = null;
   aup = null
+  admin = null
   ngOnInit(): void {
+    this.admin = localStorage.getItem("admin")
     this.init()
   }
   init(){

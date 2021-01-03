@@ -29,7 +29,7 @@ export class LoginService {
 
   handleError(error) {
     let errorMessage = '';
-    window.alert(error);
+    window.alert(error.error);
     return throwError(error);
   }
 }

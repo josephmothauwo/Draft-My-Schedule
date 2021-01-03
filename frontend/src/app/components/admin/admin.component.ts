@@ -9,8 +9,9 @@ import { AdminService } from 'src/app/services/admin.service';
 export class AdminComponent implements OnInit {
 
   constructor(private AdminService: AdminService) { }
-
+  admin = null
   ngOnInit(): void {
+    this.admin = localStorage.getItem("admin")
   }
   givePriveleges(email:string){
     this.AdminService.givePriveleges(email).subscribe(user => {

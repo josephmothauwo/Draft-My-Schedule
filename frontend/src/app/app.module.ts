@@ -43,7 +43,6 @@ import { AdminComponent } from './components/admin/admin.component';
 import { PrivacyComponent } from './components/privacy/privacy.component';
 
 
-
 @NgModule({
   declarations: [
     AppComponent,
