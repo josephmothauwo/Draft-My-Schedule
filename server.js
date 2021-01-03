@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const express = require('express')
 const bcrypt = require("bcryptjs")
 const stringSimilarity = require('string-similarity');
+var validator = require("email-validator");
 var fs = require('fs')
 var usersData = fs.readFileSync("users.json")
 var users = JSON.parse(usersData)
@@ -88,14 +89,7 @@ router.post('/register', (req,res)=>{
           res.status(404).send("no password")
           return
         }
-        flag = 0
-        for (var i = 0; i < req.body.email.length; i++) {
-          if(req.body.email[i]=="@"){
-            flag = i
-          }
-        }
-        
-        if(req.body.email.length - 1 == flag || flag == 0){
+        if(!validator.validate(req.body.email)){
           res.status(404).send("not a valid email")
           return
         }
