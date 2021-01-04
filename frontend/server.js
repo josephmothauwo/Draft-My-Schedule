@@ -34,11 +34,6 @@ app.listen(PORT, () => {
 
 app.use(cors());
 app.use('/',  express.static('dist/frontend'));
-initializePassport(
-    passport,
-    email => users.find(user => user.email === email),
-    id => users.find(user => user.id === id)
-)
 
 app.use(flash())
 app.use(session({
@@ -46,8 +41,6 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }))
-app.use(passport.initialize())
-app.use(passport.session())
 
 router.use(express.json());
 app.use('/UA', router);
