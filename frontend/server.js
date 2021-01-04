@@ -440,13 +440,14 @@ router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (re
   if(isPublic == "YES"){
     publicSched = true
   }
+  let tempDate = new Date()
   const newSchedule = {
       name: schedule_name,
       description: description,
       isPublic: publicSched,
       email: req.user["email"],
       username: req.user["username"],
-      lastUpdated: new Date(), 
+      lastUpdated: tempDate.toString(), 
       courses: [] 
   }
   schedules.push(newSchedule)
@@ -665,8 +666,8 @@ router.put('/editSchedule', verifyToken, (req, res) => {
     }
   }
 // add the date updated
-  currSchedule["lastUpdated"] = new Date()
-  console.log(new Date())
+  let tempDate = new Date ()
+  currSchedule["lastUpdated"] = tempDate.toString()
   var data = JSON.stringify(schedules, null, 2)
   fs.writeFile('schedules.json', data, (err) => {
       if (err) throw err;
