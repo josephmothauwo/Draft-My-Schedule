@@ -339,6 +339,10 @@ router.post('/login', (req, res) => {
     res.status(404).send('invalid input')
     return
   }
+  if(!validator.validate(req.body.email)){
+    res.status(404).send("not a valid email")
+    return
+  }
   authenticatedUser = null
   for(user of users){
     // console.log(user.password, req.body.password)
