@@ -9,10 +9,7 @@
 
 # dependencies
 /node_modules
-*.json
-karma.conf.js
-.editorconfig
-.browserslistrc
+
 # profiling files
 chrome-profiler-events*.json
 speed-measure-plugin*.json
