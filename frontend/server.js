@@ -34,7 +34,7 @@ app.listen(PORT, () => {
 });
 
 app.use(cors());
-
+app.use('/',  express.static('dist/frontend'));
 initializePassport(
     passport,
     email => users.find(user => user.email === email),
@@ -126,7 +126,7 @@ router.post('/register', (req,res)=>{
         }
         console.log(tempUser)
         const accessToken = jwt.sign(jwtUser, process.env.ACCESS_TOKEN_SECRET)
-        const url = `http://localhost:3000/UA/confirmation/${accessToken}`
+        const url = `/UA/confirmation/${accessToken}`
         tempUser.accessToken = url
         tempUser.loginToken = accessToken
         users.push(tempUser)

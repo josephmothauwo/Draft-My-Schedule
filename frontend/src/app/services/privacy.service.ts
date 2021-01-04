@@ -8,7 +8,7 @@ import { retry, catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class PrivacyService {
-  getPoliciesURL: string = 'http://localhost:3000/UA/getPolicies';
+  getPoliciesURL: string = '/UA/getPolicies';
   constructor(private http:HttpClient) {
     
    }

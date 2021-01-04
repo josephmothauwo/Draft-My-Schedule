@@ -18,9 +18,9 @@ export class HomepageService {
 
   constructor(private http:HttpClient) { }
   
-  courseComponentsURL: string = 'http://localhost:3000/UA/courses/';
-  keyWordURL: string = 'http://localhost:3000/UA/keyword/';
-  publicCourseListsURL : string = 'http://localhost:3000/UA/publicCourseLists';
+  courseComponentsURL: string = '/UA/courses/';
+  keyWordURL: string = '/UA/keyword/';
+  publicCourseListsURL : string = '/UA/publicCourseLists';
   getCourseComponents(component:string):Observable<any[]>{
     console.log("get request for courses components!")
     console.log(component)

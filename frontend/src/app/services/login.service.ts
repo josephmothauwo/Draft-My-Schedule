@@ -14,7 +14,7 @@ const httpOptions = {
 })
 export class LoginService {
 
-  loginURL: string = 'http://localhost:3000/UA/login'
+  loginURL: string = '/UA/login'
   constructor(private http:HttpClient) { }
   login(email:string, password:string):Observable<any>{
     const body= {

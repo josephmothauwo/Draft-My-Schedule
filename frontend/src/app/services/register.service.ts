@@ -13,7 +13,7 @@ const httpOptions = {
 })
 export class RegisterService {
 
-  registerURL: string = 'http://localhost:3000/UA/register'
+  registerURL: string = '/UA/register'
   constructor(private http:HttpClient) { }
   register(email:string, username:string, password:string):Observable<any>{
     const body= {

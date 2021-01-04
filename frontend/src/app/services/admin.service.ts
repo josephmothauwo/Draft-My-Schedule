@@ -9,12 +9,12 @@ import { retry, catchError } from 'rxjs/operators';
 })
 export class AdminService {
   // all urls for getting to the backend
-  givePrivelegesURL: string = 'http://localhost:3000/UA/givePriveleges';
-  hideReviewURL: string = 'http://localhost:3000/UA/hideReview';
-  showReviewURL: string = 'http://localhost:3000/UA/showReview';
-  deactivateURL: string = 'http://localhost:3000/UA/deactivate';
-  reactivateURL: string = 'http://localhost:3000/UA/reactivate';
-  policyURL: string = 'http://localhost:3000/UA/policy';
+  givePrivelegesURL: string = '/UA/givePriveleges';
+  hideReviewURL: string = '/UA/hideReview';
+  showReviewURL: string = '/UA/showReview';
+  deactivateURL: string = '/UA/deactivate';
+  reactivateURL: string = '/UA/reactivate';
+  policyURL: string = '/UA/policy';
   constructor(private http:HttpClient) { }
   // give all priveleges to the any user
   givePriveleges(email:string):Observable<any>{

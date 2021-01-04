@@ -8,13 +8,13 @@ import { retry, catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthenticatedService {
-  scheduleNameURL: string = 'http://localhost:3000/UA/schedules/';
-  allSchedulesURL: string = 'http://localhost:3000/UA/all_schedules';
-  addCourseURL: string = 'http://localhost:3000/UA/schedule/courses';
-  editScheduleURL: string = 'http://localhost:3000/UA/editSchedule';
-  addReviewURL: string = 'http://localhost:3000/UA/addReview';
-  newPasswordURL: string = 'http://localhost:3000/UA/newPassword';
-  getScheduleURL: string = 'http://localhost:3000/UA/schedule/';
+  scheduleNameURL: string = '/UA/schedules/';
+  allSchedulesURL: string = '/UA/all_schedules';
+  addCourseURL: string = '/UA/schedule/courses';
+  editScheduleURL: string = '/UA/editSchedule';
+  addReviewURL: string = '/UA/addReview';
+  newPasswordURL: string = '/UA/newPassword';
+  getScheduleURL: string = '/UA/schedule/';
   // scheduleNameURL: string = '/api/schedules/';
   constructor(private http:HttpClient) { }
 
