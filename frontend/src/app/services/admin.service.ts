@@ -8,6 +8,7 @@ import { retry, catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AdminService {
+  // all urls for getting to the backend
   givePrivelegesURL: string = 'http://localhost:3000/UA/givePriveleges';
   hideReviewURL: string = 'http://localhost:3000/UA/hideReview';
   showReviewURL: string = 'http://localhost:3000/UA/showReview';
@@ -15,6 +16,7 @@ export class AdminService {
   reactivateURL: string = 'http://localhost:3000/UA/reactivate';
   policyURL: string = 'http://localhost:3000/UA/policy';
   constructor(private http:HttpClient) { }
+  // give all priveleges to the any user
   givePriveleges(email:string):Observable<any>{
     console.log(localStorage.getItem('currentToken'))
     let headers: HttpHeaders = new HttpHeaders();
@@ -31,7 +33,7 @@ export class AdminService {
       catchError(this.handleError)
     );
   }
-
+//  hide a review in question for DMCA
   hideReview(id:string):Observable<any>{
     console.log(localStorage.getItem('currentToken'))
     let headers: HttpHeaders = new HttpHeaders();
@@ -48,7 +50,7 @@ export class AdminService {
       catchError(this.handleError)
     );
   }
-
+// show a review that should be shown again
   showReview(id:string):Observable<any>{
     console.log(localStorage.getItem('currentToken'))
     let headers: HttpHeaders = new HttpHeaders();
@@ -65,7 +67,7 @@ export class AdminService {
       catchError(this.handleError)
     );
   }
-
+// deactivate a user who has been violated the AUP
   deactivateUser(email:string):Observable<any>{
     console.log(localStorage.getItem('currentToken'))
     let headers: HttpHeaders = new HttpHeaders();
@@ -82,7 +84,7 @@ export class AdminService {
       catchError(this.handleError)
     );
   }
-
+// reactivate a user who was wrongly deactivated
   reactivateUser(email:string):Observable<any>{
     console.log(localStorage.getItem('currentToken'))
     let headers: HttpHeaders = new HttpHeaders();
@@ -99,6 +101,7 @@ export class AdminService {
       catchError(this.handleError)
     );
   }
+  // update any of the policies
   updatePolicy(policy:string, policyName: string):Observable<any>{
     console.log(localStorage.getItem('currentToken'))
     let headers: HttpHeaders = new HttpHeaders();

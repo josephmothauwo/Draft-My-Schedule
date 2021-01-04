@@ -1,6 +1,7 @@
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
-  }  
+  }
+  // all dependencies are listed 
 const jwt = require('jsonwebtoken')
 const express = require('express')
 const bcrypt = require("bcryptjs")
@@ -52,7 +53,7 @@ app.use(passport.session())
 router.use(express.json());
 app.use('/UA', router);
 
-
+// this is for email confirmation that will be posted to the user
 router.get("/confirmation/:token", (req,res)=>{
   console.log(req.params.token)
   jwt.verify(req.params.token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -70,7 +71,7 @@ router.get("/confirmation/:token", (req,res)=>{
 })
 
 router.post('/register', (req,res)=>{
-  
+  // registration with all checks if the right information is given
     try{
       if (req.body.email.length == 0 && req.body.password.length == 0){
         res.status(404).send("no email and password given")
@@ -93,8 +94,9 @@ router.post('/register', (req,res)=>{
           res.status(404).send("not a valid email")
           return
         }
-        
-        if(validate(req.body.email) || sanitizationEmail(req.body.email) || validate(req.body.password) || sanitization(req.body.password) || validate(req.body.username) || sanitization(req.body.username)){
+        // validate input
+        console.log(validate(req.body.email) , sanitizationEmail(req.body.email) , validate(req.body.password) , sanitization(req.body.password) , validate(req.body.username) , sanitization(req.body.username))
+        if(sanitizationEmail(req.body.email) || validate(req.body.password) || sanitization(req.body.password) || validate(req.body.username) || sanitization(req.body.username)){
           res.status(404).send('invalid input or no username')
           return
         }
@@ -104,7 +106,7 @@ router.post('/register', (req,res)=>{
           res.status(404).send("this email already exisits")
           return
         }
-        
+        // hashed password
         const hashedPassword = bcrypt.hashSync(req.body.password, 10)
         console.log(req.body.password,hashedPassword, "this is the hashed password")
         let tempUser = {
@@ -118,8 +120,12 @@ router.post('/register', (req,res)=>{
           accessToken: null, 
           loginToken: null
         }
+        jwtUser = {
+          email :req.body.email,
+          username :req.body.username,
+        }
         console.log(tempUser)
-        const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
+        const accessToken = jwt.sign(jwtUser, process.env.ACCESS_TOKEN_SECRET)
         const url = `http://localhost:3000/UA/confirmation/${accessToken}`
         tempUser.accessToken = url
         tempUser.loginToken = accessToken
@@ -138,12 +144,12 @@ router.post('/register', (req,res)=>{
       
     }
 })
-
+// get courses with a subject and coursecode
 router.get('/courses/:subject?/:course_code?', (req, res) => {
   console.log(req.params.subject, req.params.course_code)
   
   // filter course codes
-  
+  // no course code given
   tableEntry = []
   if(!req.params.course_code){
     if(validate(req.params.subject) || sanitization(req.params.subject)){
@@ -174,6 +180,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
           }
       }
   }
+  // no subject given
   else if(req.params.subject == "NONE"){
     
     if(validate(req.params.course_code) || sanitization(req.params.course_code)){
@@ -210,7 +217,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
       }
     }
   }
-  
+  // both  subject and coursecode are given
   else{
       if(validate(req.params.course_code) || sanitization(req.params.course_code) || validate(req.params.subject) || sanitization(req.params.subject)){
           res.status(404).send('invalid input')
@@ -254,7 +261,7 @@ router.get('/courses/:subject?/:course_code?', (req, res) => {
   }
   res.send(tableEntry)
 });
-
+// get all the public course lists and sort them
 router.get('/publicCourseLists', (req, res) => {
   console.log("get request for 10 public course lists" )
   let publicCourseLists = []
@@ -267,7 +274,7 @@ router.get('/publicCourseLists', (req, res) => {
   publicCourseLists.sort(compareScheduleTime)
   return res.send(publicCourseLists)
 });
-
+// set new passwrord and check if the passwords are the same
 router.put('/newPassword', verifyToken, (req, res) => {
   let newToken = null
   console.log(req.body.newPassword, req.body.confirmedPassword)
@@ -282,7 +289,11 @@ router.put('/newPassword', verifyToken, (req, res) => {
   for(user of users){
     if (req.user["email"].toUpperCase() == user["email"].toUpperCase()){
       user["password"] = bcrypt.hashSync(req.body.newPassword, 10)
-      newToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
+      jwtUser = {
+        email :user["email"],
+        username :user["username"],
+      }
+      newToken = jwt.sign(jwtUser, process.env.ACCESS_TOKEN_SECRET)
       user["loginToken"] = newToken
       console.log(user)
     }
@@ -328,10 +339,10 @@ router.get('/keyword/:keyword', (req, res) => {
   console.log(tableEntry)
   return res.send(tableEntry)
 });
-
+// login without passport
 router.post('/login', (req, res) => {
-  // call passport authentication passing the "local" strategy name and a callback function
-  if(validate(req.body.email) || sanitizationEmail(req.body.email) || validate(req.body.password) || sanitization(req.body.password)){
+  // validation and sanitization
+  if(sanitizationEmail(req.body.email) || validate(req.body.password) || sanitization(req.body.password)){
     res.status(404).send('invalid input')
     return
   }
@@ -343,13 +354,14 @@ router.post('/login', (req, res) => {
       authenticatedUser = user
     }
   }
+  console.log(authenticatedUser)
   if (authenticatedUser == null) {
     res.status(401).send("username or password is wrong")
     return
   }
   
   //   console.log(info);
-  else if(!user.isVerified){
+  else if(!authenticatedUser.isVerified){
     console.log("not verified");
     var sendback = {
       message:"not verified",
@@ -357,15 +369,20 @@ router.post('/login', (req, res) => {
     }
     res.send(sendback).status(401)
     return
-  } 
-  else if(user.isDeactivated){
-
+  }
+  
+  else if(authenticatedUser.isDeactivated){
+    console.log(user)
     res.status(401).send("Your account has been deactivated please the call the admin at: 123-456-7890");
     return
   } 
   else {
     const username = authenticatedUser.username;
-    const accessToken = jwt.sign(authenticatedUser, process.env.ACCESS_TOKEN_SECRET)
+    tempUser = {
+      email :authenticatedUser.email,
+      username :authenticatedUser.username,
+    }
+    const accessToken = jwt.sign(tempUser, process.env.ACCESS_TOKEN_SECRET)
     authenticatedUser.loginToken = accessToken
     const access = {
       message:"logged in!",
@@ -400,7 +417,7 @@ router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (re
       description = strip(req.params.description)
     }
 }
-
+// check if the new schedule is public
   if(req.params.isPublic!="False"){
     console.log(req.params.isPublic)
     if((validate(req.params.isPublic) || sanitization(req.params.isPublic))){
@@ -414,7 +431,7 @@ router.put('/schedules/:schedule_name/:isPublic/:description?', verifyToken, (re
   }
   const schedule_name = strip(req.params.schedule_name)
   console.log("hello")
-  if(schedules.find(s => s.name.toUpperCase() === schedule_name.toUpperCase())){
+  if(schedules.find(s => s.name.toUpperCase() === schedule_name.toUpperCase() && req.user.email.toUpperCase() == s.username.toUpperCase())){
       res.status(404).send('Name is already present or invalid name')
       return
   }
@@ -475,7 +492,7 @@ router.delete('/schedules/:schedule_name', verifyToken, (req, res) => {
   res.send(schedule)
 });
 
-// get all the schedules
+// get all the schedules for a given user
 router.get('/all_schedules',verifyToken, (req, res) => {
   console.log(`GET request from ${req.url}`);
   userEmail = req.user["email"]
@@ -488,7 +505,7 @@ router.get('/all_schedules',verifyToken, (req, res) => {
   res.send(scheduleSummary)
 });
 
-// get one schedules
+// get one schedules given the name
 router.get('/schedule/:scheduleName',verifyToken, (req, res) => {
   console.log(`GET request from ${req.url}`);
   if(validate(req.params.scheduleName) || sanitization(req.params.scheduleName)){
@@ -498,7 +515,6 @@ router.get('/schedule/:scheduleName',verifyToken, (req, res) => {
   userEmail = req.user["email"]
   let currSchedule = null
   for(schedule of schedules){
-      // console.log(userEmail.toUpperCase() , schedule["email"].toUpperCase() , req.params.scheduleName.toUpperCase() , schedule.name.toUpperCase())
       if(userEmail.toUpperCase() == schedule["email"].toUpperCase() && req.params.scheduleName.toUpperCase() == schedule.name.toUpperCase() ){
         currSchedule = schedule
       }
@@ -512,7 +528,7 @@ router.get('/schedule/:scheduleName',verifyToken, (req, res) => {
     return
   }
 });
-
+// get all the public schedules to show to UA users
 router.get('/publicSchedules', (req, res) => {
   console.log(`GET request from ${req.url}`);
   userEmail = req.user["email"]
@@ -527,7 +543,7 @@ router.get('/publicSchedules', (req, res) => {
 
 
 
-// edit a schedule
+// edit a schedule for a given user
 router.put('/editSchedule', verifyToken, (req, res) => {
   let scheduleName = null
   let newName = null
@@ -536,7 +552,7 @@ router.put('/editSchedule', verifyToken, (req, res) => {
   let addCourse = null
   let deleteCourse = null
   let currSchedule = null
-
+// check which operations to do
   if (!req.body.scheduleName){
     res.status(400).send('we need a schedule name')
       return 
@@ -578,6 +594,7 @@ router.put('/editSchedule', verifyToken, (req, res) => {
       currSchedule["description"] = description
     } 
   }
+  // add change public status
   if(req.body.isPublic.length > 0){
     if(validate(req.body.isPublic) || sanitization(req.body.isPublic) ){
     res.status(400).send('invalid input')
@@ -593,6 +610,7 @@ router.put('/editSchedule', verifyToken, (req, res) => {
       }
     }
   }
+  // add a course
   if(req.body.addCourse.length > 0){
     if(validate(req.body.addCourse) || sanitization(req.body.addCourse) || req.body.addCourse.split(" ").length != 2){
     res.status(400).send('invalid input')
@@ -624,7 +642,7 @@ router.put('/editSchedule', verifyToken, (req, res) => {
       if (!isCourse) res.status(400).send("no course with that name to add")
     } 
   }
-
+// delete course
   if(req.body.deleteCourse.length > 0){
     if(validate(req.body.deleteCourse) || sanitization(req.body.deleteCourse) || req.body.deleteCourse.split(" ").length != 2){
     res.status(400).send('invalid input')
@@ -645,7 +663,7 @@ router.put('/editSchedule', verifyToken, (req, res) => {
       if (!isCourse) res.status(400).send(" no course with that name to delete")
     }
   }
-
+// add the date updated
   currSchedule["lastUpdated"] = new Date()
   console.log(new Date())
   var data = JSON.stringify(schedules, null, 2)
@@ -657,7 +675,7 @@ router.put('/editSchedule', verifyToken, (req, res) => {
 // add review to course
 router.put('/addReview', verifyToken, (req, res) => {
   console.log("get put request to get add review!")
-  if(validate(req.body.courseName) || sanitization(req.body.courseName) || validate(req.body.review) || sanitization(req.body.review) || req.body.courseName.split(" ").length != 2){
+  if(validate(req.body.courseName) || sanitization(req.body.courseName) || sanitization(req.body.review) || req.body.courseName.split(" ").length != 2){
     res.status(400).send('invalid input')
     return 
     } 
@@ -696,7 +714,7 @@ router.put('/addReview', verifyToken, (req, res) => {
   res.send(reviews) 
 
 });
-
+// make someone an admin 
 router.put('/givePriveleges', verifyToken, (req, res) => {
   if(validate(req.body.email) || sanitizationEmail(req.body.email)){
     res.status(400).send('invalid input')
@@ -719,7 +737,7 @@ router.put('/givePriveleges', verifyToken, (req, res) => {
   res.send(currUser) 
 
 });
-
+// ability to hide a review and make it not public for DMCA
 router.put('/hideReview', verifyToken, (req, res) => {
   console.log("put request to hide review")
   if(sanitization(req.body.id)){
@@ -740,7 +758,7 @@ router.put('/hideReview', verifyToken, (req, res) => {
   });
   res.send(currReview) 
 });
-
+// ability to show review again in case of counter notice in DMCA
 router.put('/showReview', verifyToken, (req, res) => {
   console.log("put request to hide review")
   if(sanitization(req.body.id)){
@@ -761,7 +779,7 @@ router.put('/showReview', verifyToken, (req, res) => {
   });
   res.send(currReview) 
 });
-
+// ability to deactivate user in the case they do not abide by site rules
 router.put('/deactivate', verifyToken, (req, res) => {
   console.log("put request to deactivate user")
   if(sanitizationEmail(req.body.email) || validate(req.body.email)){
@@ -782,7 +800,7 @@ router.put('/deactivate', verifyToken, (req, res) => {
   });
   res.send(currUser) 
 });
-
+// ability to reactivate user in case they are given access again
 router.put('/reactivate', verifyToken, (req, res) => {
   console.log("put request to deactivate user")
   if(sanitizationEmail(req.body.email) || validate(req.body.email)){
@@ -803,7 +821,7 @@ router.put('/reactivate', verifyToken, (req, res) => {
   });
   res.send(currUser) 
 });
-
+// this will update the given policy with the new poicy
 router.put('/policy', verifyToken, (req, res) => {
   console.log("put request to policy update")
   if(sanitizationPolicy(req.body.policy)){
@@ -821,17 +839,17 @@ router.put('/policy', verifyToken, (req, res) => {
   });
   res.send([req.body.policy]) 
 });
-
+// this will get the policies stored in the db and post them
 router.get('/getPolicies', (req, res) => {
   console.log("get request to get policies")
   res.send(policies) 
 });
-
+// validation that string is a certian length
 function validate(inputString){
   return ((inputString.length<2) || (inputString.length>20))
 }
 
-
+// check for special characters in the string
 function sanitization(inputString){
   const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/g;
   const output = inputString.replace(format, "");
@@ -843,7 +861,7 @@ function sanitization(inputString){
       return true;
   }
 }
-
+// special check for emails because they have special characters
 function sanitizationEmail(inputString){
   const format = /[`!#$%^&*()_+\-=\[\]{};':"\\|,<>\/?~]/g;
   const output = inputString.replace(format, "");
@@ -855,9 +873,9 @@ function sanitizationEmail(inputString){
       return true;
   }
 }
-
+// special check for policy because they should be allowed puncuation
 function sanitizationPolicy(inputString){
-  const format = /[`#$%^&*()_+\-=\[\]{}'"\\|,<>\/?~]/g;
+  const format = /[`#$%^&*()_+\=\[\]{}"\\|<>\?~]/g;
   const output = inputString.replace(format, "");
 
   if (inputString  === output){
@@ -872,6 +890,7 @@ function strip(inputString){
   const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/g;
   return inputString.replace(format, "")
 }
+// comparisin for sorting the order of public strings based on last updated time
 function compareScheduleTime(a, b){
   if (a["lastUpdated"] > b["lastUpdated"]) return -1;
   if (a["lastUpdated"] < b["lastUpdated"]) return 1;
