@@ -77,7 +77,6 @@ router.post('/register', (req,res)=>{
           res.status(404).send("no email")
           return
         }
-        
         if (req.body.password.length == 0){
           res.status(404).send("no password")
           return
@@ -335,6 +334,18 @@ router.get('/keyword/:keyword', (req, res) => {
 // login without passport
 router.post('/login', (req, res) => {
   // validation and sanitization
+  if (req.body.email.length == 0 && req.body.password.length == 0){
+    res.status(404).send("no email and password given")
+    return
+  }
+  if (req.body.password.length == 0){
+    res.status(404).send("no password")
+    return
+  }
+    if (req.body.email.length == 0){
+      res.status(404).send("no email")
+      return
+    }
   if(sanitizationEmail(req.body.email) || validate(req.body.password) || sanitization(req.body.password)){
     res.status(404).send('invalid input')
     return
