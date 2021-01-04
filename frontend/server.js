@@ -266,12 +266,13 @@ router.get('/publicCourseLists', (req, res) => {
   console.log("get request for 10 public course lists" )
   let publicCourseLists = []
   for(let i = 0; i < schedules.length && i < 10; i ++){
-    console.log(schedules)
     if (schedules[i]["isPublic"]){
       publicCourseLists.push(schedules[i])
     }
   }
+  console.log(publicCourseLists)
   publicCourseLists.sort(compareScheduleTime)
+  console.log(publicCourseLists)
   return res.send(publicCourseLists)
 });
 // set new passwrord and check if the passwords are the same
