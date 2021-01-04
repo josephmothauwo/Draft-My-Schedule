@@ -126,7 +126,7 @@ router.post('/register', (req,res)=>{
         }
         console.log(tempUser)
         const accessToken = jwt.sign(jwtUser, process.env.ACCESS_TOKEN_SECRET)
-        const url = `/UA/confirmation/${accessToken}`
+        const url = `http://localhost:3000/UA/confirmation/${accessToken}`
         tempUser.accessToken = url
         tempUser.loginToken = accessToken
         users.push(tempUser)
