@@ -117,7 +117,7 @@ router.post('/register', (req,res)=>{
         }
         console.log(tempUser)
         const accessToken = jwt.sign(jwtUser, process.env.ACCESS_TOKEN_SECRET)
-        const url = `http://ec2-54-172-215-61.compute-1.amazonaws.com:3000/UA/confirmation/${accessToken}`
+        const url = `http://ec2-54-210-85-94.compute-1.amazonaws.com:3000/UA/confirmation/${accessToken}`
         tempUser.accessToken = url
         tempUser.loginToken = accessToken
         users.push(tempUser)
